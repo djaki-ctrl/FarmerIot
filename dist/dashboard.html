@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistiques du Champ</title>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+
+
+
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa; /* Couleur de fond plus douce */
+      color: #333;
+    }
+
+    .navbar {
+      background-color: #4CAF50;
+      overflow: hidden;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      padding: 14px 8px;
+      display: inline-block;
+      transition: background-color 0.3s;
+    }
+
+    .navbar a:hover {
+      background-color: #45a049;
+      color: black;
+    }
+
+
+    .container {
+      padding: 20px;
+    }
+
+    .weather-widget,
+    .sensor-container {
+      max-width: 1400px;
+      margin-top: 20px;
+    }
+
+    .weather-widget,
+    .sensor-info {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      transition: transform 0.5s;
+      cursor: pointer;
+      margin-bottom: 30px;
+    }
+
+    .sensor-info:hover,
+    .weather-widget:hover {
+      transform: scale(1.13); /* Légère réduction de l'effet de zoom */
+    }
+
+    .sensor-info h3 .bi,
+    .navbar .dropdown-content a .bi {
+      font-size: 36px;
+      margin-bottom: 10px;
+      color: #4CAF50;
+    }
+
+    .sensor-info p,
+    .sensor-info p.second-text,
+    .temp,
+    .temp-scale span,
+    .card-header span {
+      color: #4CAF50;
+    }
+
+    .sensor-info p.second-text,
+    .temp-scale span {
+      font-size: 0.9em;
+    }
+
+ /* Styles personnalisés pour la météo */
+.weather-widget h2,
+.sensor-container h2 {
+  margin-top: 0;
+  color: #4d804d; /* Couleur du titre */
+  border-bottom: 2px solid #4d804d; /* Bordure inférieure */
+  padding-bottom: 10px;
+}
+
+.weather-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.weather-icon {
+  font-size: 64px; /* Taille de l'icône météo */
+  color: gold; /* Couleur dorée pour l'icône météo */
+}
+
+.weather-details {
+  max-width: 400px;
+}
+
+.weather-details h2 {
+  margin-top: 0;
+  color: #4d804d; /* Couleur du titre */
+  font-size: 24px;
+}
+
+.weather-details p {
+  margin: 5px 0;
+  font-size: 16px;
+  color: #4CAF50; /* Couleur du texte */
+}
+
+.containerS {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-container {
+  position: relative;
+}
+
+#sensorSearch {
+  width: 100%;
+  padding: 10px 40px 10px 15px;
+  border: 2px solid #ccc;
+  border-radius: 25px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+#sensorSearch:focus {
+  border-color: #4CAF50;
+  outline: none;
+  width: 110%; /* Ajustez la largeur comme vous le souhaitez */
+  transition: border-color 0.3s, width 0.3s; /* Ajoutez la transition de largeur */
+}
+
+
+#sensorSearch::placeholder {
+  color: #999;
+}
+
+#searchIcon {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  color: #999;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+#searchIcon:hover {
+  color: #4CAF50;
+}
+
+
+
+
+
+/* Style pour la sélection du filtre de données */
+/* Style pour la sélection du filtre de données */
+#timeInterval {
+  margin-left: 10px; /* Ajoute un espace à gauche de la liste déroulante */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 16px; /* Ajuste la taille de la police */
+  color: #333; /* Couleur du texte */
+  background-color: #fff; /* Couleur de fond */
+  transition: border-color 0.3s, color 0.3s, background-color 0.3s; /* Ajoute des transitions fluides */
+}
+
+#timeInterval:hover,
+#timeInterval:focus {
+  border-color: #4CAF50; /* Change la couleur de la bordure au survol */
+  color: #4CAF50; /* Change la couleur du texte au survol */
+  background-color: #f8f9fa; /* Change la couleur de fond au survol */
+}
+
+
+
+footer {
+  position: relative;
+  background-color: #4CAF50;
+  color: white;
+  text-align: center;
+  padding: 20px 0; /* Ajout d'un espacement supplémentaire en haut et en bas */
+}
+
+footer a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s; /* Ajout d'une transition pour les liens */
+}
+
+footer a:hover {
+  color: #f8f9fa; /* Changement de couleur au survol */
+}
+footer .footer-logo {
+  width: 50px; /* Largeur souhaitée pour le logo */
+  height: auto; /* Pour conserver le ratio de l'image */
+  vertical-align: middle; /* Aligner verticalement par rapport au texte */
+  margin-right: 10px; /* Ajouter un espacement à droite du logo */
+}
+/* Styles pour le conteneur de gestion des capteurs */
+.sensor-management-container {
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.sensor-management-container h2 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+
+/* Styles pour le bouton "Ajouter un Capteur" */
+#add-sensor-btn {
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    margin-top: 20px; /* Ajout d'une marge en haut pour l'espace */
+}
+/* Styles pour le contenu du formulaire dans le modal */
+#add-sensor-form {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+#add-sensor-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#add-sensor-form input {
+    width: calc(100% - 20px); /* Ajustement pour éviter les débordements horizontaux */
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+#add-sensor-btn:hover {
+    background-color: #45a049;
+}
+
+#add-sensor-btn i {
+    margin-right: 8px;
+}
+
+/* Styles pour la liste des capteurs */
+#sensor-list {
+    margin-top: 20px;
+}
+
+/* Styles pour chaque capteur individuel */
+.sensor {
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sensor-name {
+    font-weight: bold;
+}
+
+.sensor-options {
+    display: flex;
+    align-items: center;
+}
+
+.sensor-delete-btn {
+    background-color: #ff4d4d;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    font-size: 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.sensor-delete-btn:hover {
+    background-color: #45a049;
+}
+
+/* Styles spécifiques pour le modal d'ajout de capteur */
+#add-sensor-modal .modal-dialog {
+    max-width: 500px; /* Ajustez la largeur maximale du modal selon vos besoins */
+}
+
+#add-sensor-modal .modal-content {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#add-sensor-modal .modal-header {
+    border-bottom: none; /* Supprimer la bordure inférieure de l'en-tête */
+}
+
+#add-sensor-modal .modal-title {
+    font-size: 18px;
+}
+
+#add-sensor-modal .modal-body {
+    padding-top: 0;
+}
+
+#add-sensor-modal .form-group {
+    margin-bottom: 20px; /* Supprimer la marge sous les groupes de formulaire */
+}
+
+#add-sensor-modal .btn-primary {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+#add-sensor-modal .btn-secondary {
+    background-color: #ddd;
+    color: #333;
+}
+.sensor-block {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sensor-info {
+    flex-grow: 1;
+}
+
+.sensor-info h3 {
+    margin-bottom: 8px;
+}
+/* Style pour le bouton de déconnexion */
+.logout-btn {
+  color: white; /* Couleur du texte */
+  text-decoration: none; /* Supprime le soulignement du texte */
+  padding: 10px 20px; /* Espacement à l'intérieur du bouton */
+  background-color: #379422; /* Couleur de fond par défaut */
+  border: none; /* Supprime la bordure */
+  border-radius: 50px; /* Arrondi les coins pour créer un bouton rond */
+  transition: background-color 0.3s; /* Transition fluide lors du survol */
+  position: relative; /* Position relative pour le positionnement absolu du texte */
+}
+
+.logout-btn::after {
+  content: "Déconnexion"; /* Ajoutez le texte "Déconnexion" */
+  position: absolute; /* Positionnez le texte par rapport au bouton */
+  top: 50%; /* Centre le texte verticalement */
+  left: calc(100% + 10px); /* Déplacez le texte à droite du bouton avec un espacement de 10px */
+  transform: translateY(-50%); /* Centre le texte verticalement */
+  white-space: nowrap; /* Empêchez le texte de se retourner s'il est trop long */
+  background-color: #379422; /* Couleur de fond par défaut */
+  color: white; /* Couleur du texte */
+  border-radius: 5px; /* Arrondi les coins */
+  transition: opacity 0.3s, transform 0.3s; /* Ajoutez une transition fluide */
+  opacity: 0; /* Par défaut, le texte est transparent */
+  pointer-events: none; /* Le texte ne doit pas être cliquable */
+}
+
+.logout-btn:hover::after {
+  opacity: 1; /* Affichez le texte au survol */
+  transform: translateY(-50%) translateX(10px); /* Déplacez le texte à sa position finale avec un léger décalage */
+}
+
+
+
+/* Style pour l'icône de déconnexion */
+.logout-btn .bi {
+  margin-right: 5px; /* Espacement entre l'icône et le texte */
+  font-size: 1.2em; /* Ajustement de la taille de l'icône */
+  vertical-align: auto; /* Centre l'icône verticalement */
+  margin-left: 4px;
+}
+.chart-container canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+.chart-container {
+    margin: 20px 0; /* Ajoutez des marges pour l'espacement vertical */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border-radius: 5px;
+}
+@media (max-width: 576px) {
+    .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+/* styles.css */
+/* styles.css */
+#welcomeMessage {
+    font-family: 'Arial', sans-serif;
+    font-size: 24px;
+    color: #444;
+    font-weight: 500;
+    text-align: center;
+    margin: 30px auto;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1s ease-in;
+    transition: background-color 0.3s ease; /* Ajoutez une transition pour le changement de couleur de fond */
+}
+
+#welcomeMessage:hover {
+    background-color: #f0f0f0; /* Changez légèrement la couleur de fond au survol pour une interaction */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ajoutez un effet de "pulsation" pour attirer l'attention */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+#welcomeMessage:hover {
+    animation: pulse 1s infinite; /* Appliquez l'effet de pulsation au survol */
+}
+
+
+
+
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="dashboard.html"><i class="bi bi-house-door"></i> Accueil</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="statistiques.html"><i class="bi bi-bar-chart-line"></i> Statistiques</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        <i class="bi bi-speedometer2"></i> Capteurs
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#temperature"><i class="bi bi-thermometer"></i> Température</a></li>
+                        <li><a class="dropdown-item" href="#lightIntensity"><i class="bi bi-brightness-high"></i> Intensité Lumineuse</a></li>
+                        <li><a class="dropdown-item" href="#soilMoisture"><i class="bi bi-cloud-rain"></i> Humidité du Sol</a></li>
+                        <li><a class="dropdown-item" href="#gasConcentration"><i class="bi bi-cloud"></i> Concentration de Gaz</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="info.html"><i class="bi bi-info-circle"></i> Infos</a>
+                </li>
+                <li id="userNavItem" class="nav-item">
+                    <!-- Le nom de l'utilisateur connecté sera inséré ici -->
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link logout-btn" href="#" id="logoutBtn">
+                        <i class="bi bi-power"></i> <!-- Icône de déconnexion -->
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div id="welcomeMessage"></div>
+  
+
+  <div class="container">
+    <div class="containerS">
+      <!-- Barre de recherche pour les capteurs -->
+      <div class="search-container">
+        <input type="text" id="sensorSearch" placeholder="Rechercher un capteur..." onkeyup="searchSensors()">
+        <i class="bi bi-search" id="searchIcon"></i>
+      </div>
+      
+      <!-- Filtrage des données -->
+      <select aria-label="times" id="timeInterval" onchange="filterData()">
+        <option value="hour">Dernière heure</option>
+        <option value="day">Dernier jour</option>
+        <option value="week">Dernière semaine</option>
+        <!-- Autres options de filtrage -->
+      </select>
+    </div>
+    <div class="sensor-management-container">
+      <h2>Gestion des Capteurs</h2>
+      <button id="add-sensor-btn">
+          <i class="bi bi-plus"></i> Ajouter un Capteur
+      </button>
+  
+      <div id="sensor-list">
+        
+          <!-- Ici seront affichés les capteurs existants -->
+      </div>
+  
+      <div id="add-sensor-modal" class="modal" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title">Ajouter un Capteur</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      <form id="add-sensor-form">
+                          <div class="form-group">
+                              <label for="sensor-name">Nom du Capteur:</label>
+                              <input type="text" class="form-control" id="sensor-name" required>
+                          </div>
+                          <div class="form-group">
+                              <label for="api-key">Clé API:</label>
+                              <input type="text" class="form-control" id="api-key" required>
+                          </div>
+                          <div class="form-group">
+                              <button type="submit" class="btn btn-primary">Ajouter</button>
+                              <button type="button" class="btn btn-secondary" id="close-modal-btn" data-dismiss="modal">Fermer</button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+    
+    
+    
+    <h2 class="mb-4">Tableau de Bord des Capteurs</h2>
+
+    <div class="accordion" id="accordionExample">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+            aria-expanded="false" aria-controls="collapseOne">
+            Météo
+          </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+          data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <div class="weather-info">
+              <div class="weather-icon">
+                <!-- Utilisez une icône météo appropriée en fonction de la description -->
+                <i class="bi bi-sun weather-icon gold"></i>
+              </div>
+              <div class="weather-details">
+                <h2>Abidjan, Yopougon, Cote D'ivoire</h2>
+                <p>Date: 5 Avril </p>
+                <p>Température: 28°C</p>
+                <p>Description: Beau temps malgré quelques passages nuageux.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="sensor-info" id="temperature">
+          <h3><i class="bi bi-thermometer"></i></h3>
+          <p>Température</p>
+          <p class="second-text">Données en temps réel</p>
+          <p style="text-align: right;">Température: <span id="temperatureDisplay"></span>°C</p>
+          <div class="chart-container">
+            <canvas id="temperatureChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="sensor-info" id="lightIntensity">
+          <h3><i class="bi bi-brightness-high"></i></h3>
+          <p>Intensité Lumineuse</p>
+          <p class="second-text">Données en temps réel</p>
+          <p style="text-align: right;">Intensité Lumineuse: <span id="lightIntensityDisplay"></span> lux</p>
+          <div class="chart-container">
+            <canvas id="lightIntensityChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="sensor-info" id="soilMoisture">
+          <h3><i class="bi bi-cloud-rain"></i></h3>
+          <p>Humidité du Sol</p>
+          <p class="second-text">Données en temps réel</p>
+          <p style="text-align: right;">Humidité du Sol: <span id="soilMoistureDisplay"></span> %</p>
+          <div class="chart-container">
+            <canvas id="soilMoistureChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="sensor-info" id="gasConcentration">
+          <h3><i class="bi bi-cloud"></i></h3>
+          <p>Concentration de Gaz</p>
+          <p class="second-text">Données en temps réel</p>
+          <p style="text-align: right;">Concentration de Gaz: <span id="gasConcentrationDisplay"></span> ppm</p>
+          <div class="chart-container">
+            <canvas id="gasConcentrationChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="mt-5">
+     <p>Site développé par <a href="#"><img src="/Image/logo.png" alt="Logo" class="footer-logo">Votre Nom</a> | Suivez-nous sur 
+       <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a> 
+       <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a> 
+       <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+     </p>
+  </footer>
+
+
+  
+<script>
+     // Logique JavaScript pour les fonctionnalités
+     function searchSensors() {
+      // Logique pour rechercher des capteurs
+      var input, filter, sensors, sensorContainer, sensorName, i, txtValue;
+  input = document.getElementById('sensorSearch');
+  filter = input.value.toUpperCase();
+  sensors = document.getElementsByClassName('sensor-info');
+  for (i = 0; i < sensors.length; i++) {
+    sensorContainer = sensors[i];
+    sensorName = sensorContainer.getElementsByTagName('p')[0];
+    if (sensorName) {
+      txtValue = sensorName.textContent || sensorName.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        sensorContainer.style.display = '';
+      } else {
+        sensorContainer.style.display = 'none';
+      }
+    }
+  }
+}
+
+
+function filterData() {
+      // Logique pour filtrer les données
+  var select, option, sensors, i;
+  select = document.getElementById('timeInterval');
+  option = select.value;
+  sensors = document.getElementsByClassName('sensor-info');
+  for (i = 0; i < sensors.length; i++) {
+    // Logique pour filtrer les données des capteurs en fonction de l'option sélectionnée
+  }
+}
+</script>
+
+<script>
+  //script affiche meteo
+  document.addEventListener('DOMContentLoaded', function () {
+    var collapseOne = document.getElementById('collapseOne');
+    var accordionButton = document.querySelector('[data-bs-target="#collapseOne"]');
+
+    accordionButton.addEventListener('click', function () {
+      var isOpen = collapseOne.classList.contains('show');
+      
+      if (isOpen) {
+        accordionButton.setAttribute('aria-expanded', 'false');
+        collapseOne.classList.remove('show');
+      } else {
+        accordionButton.setAttribute('aria-expanded', 'true');
+        collapseOne.classList.add('show');
+      }
+    });
+  });
+</script>
+<!-- Votre code JavaScript -->
+<script>
+ 
+  var logoutBtn = document.getElementById('logoutBtn');
+  
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function () {
+      // Ajoutez votre logique de déconnexion ici, par exemple :
+      // Redirection vers la page de connexion
+      window.location.href = 'connexion.html';
+    });
+  }
+</script>
+  
+  <script>
+    $(document).ready(function () {
+        // Configuration de Firebase
+        let firebaseConfig = {
+          apiKey: "AIzaSyAuppdI3nS-GDaM7wC1uB9mhIzonB1STNE",
+          authDomain: "esp32firebase-cac38.firebaseapp.com",
+          databaseURL: "https://esp32firebase-cac38-default-rtdb.firebaseio.com",
+          projectId: "esp32firebase-cac38",
+          storageBucket: "esp32firebase-cac38.appspot.com",
+          messagingSenderId: "904491983155",
+          appId: "1:904491983155:web:9278c9a444cc75eecdde46"
+        };
+
+        // Initialisation de Firebase
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.database();
+        var ref = db.ref("sensorData");
+
+
+
+        firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    // L'utilisateur est connecté, afficher son nom
+                    document.getElementById('userName').textContent = user.displayName;
+                    document.getElementById('userNameDisplay').style.display = 'block'; // Affiche le nom de l'utilisateur
+                } else {
+                    // L'utilisateur n'est pas connecté
+                    document.getElementById('userNameDisplay').style.display = 'none'; // Cache le nom de l'utilisateur
+                }
+            });
+
+        // Fonction pour mettre à jour la configuration de Firebase avec la nouvelle clé API
+        function updateFirebaseConfigWithApiKey(apiKey) {
+            var newDatabaseURL = apiKey ;
+            firebaseConfig.databaseURL = newDatabaseURL;
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        }
+
+        let temperatureValue = 0;
+        let lightIntensityValue = 0;
+        let soilMoistureValue = 0;
+        let gasConcentrationValue = 0;
+
+        // Tableau pour stocker les capteurs (simulera la persistance côté client)
+        var sensorsData = [];
+
+        // Fonction pour afficher les capteurs sur l'interface
+        function displaySensors() {
+            // Effacer le contenu actuel
+            $("#sensor-list").empty();
+
+            // Parcourir le tableau des capteurs et créer des blocs pour chaque capteur
+            sensorsData.forEach(function (sensor) {
+                var sensorBlock = `
+                    <div class="sensor-block" data-sensor-name="${sensor.name}" data-api-key="${sensor.apiKey}">
+                        <div class="sensor-info">
+                            <h3>${sensor.name}</h3>
+                            <p>Clé API: ${sensor.apiKey}</p>
+                        </div>
+                        <div class="sensor-actions">
+                            <!-- Ajoutez ici les éléments d'action supplémentaires si nécessaire -->
+                        </div>
+                    </div>
+                `;
+                $("#sensor-list").append(sensorBlock);
+            });
+
+            // Ajoutez cela après la création des blocs de capteur
+            $(".sensor-block").click(function () {
+                // Récupérer le nom et la clé API du capteur depuis les attributs data
+                var sensorName = $(this).data("sensor-name");
+                var apiKey = $(this).data("api-key");
+
+                // Afficher une alerte avec le nom du capteur
+                alert("Capteur sélectionné : " + sensorName);
+
+                // Appeler la fonction pour récupérer les données de l'API avec la clé API correspondante
+                updateFirebaseConfigWithApiKey(apiKey);
+            });
+        }
+
+        // Afficher le formulaire modal lors du clic sur le bouton "Ajouter un Capteur"
+        $("#add-sensor-btn").click(function () {
+            $("#add-sensor-modal").modal("show");
+        });
+
+        // Soumettre le formulaire lors du clic sur le bouton "Ajouter"
+        $("#add-sensor-form").submit(function (event) {
+            event.preventDefault();
+
+            // Récupérer les valeurs du formulaire
+            var sensorName = $("#sensor-name").val();
+            var apiKey = $("#api-key").val();
+
+            // Valider si les champs ne sont pas vides
+            if (sensorName.trim() === "" || apiKey.trim() === "") {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+            // Ajouter le capteur à la liste
+            var newSensor = {
+                name: sensorName,
+                apiKey: apiKey
+            };
+            sensorsData.push(newSensor);
+
+            // Mettre à jour l'affichage des capteurs sur l'interface
+            displaySensors();
+
+            // Fermer le formulaire modal
+            $("#add-sensor-modal").modal("hide");
+
+            // Réinitialiser les valeurs du formulaire
+            $("#sensor-name, #api-key").val("");
+        });
+
+        // Fermer le formulaire modal lorsqu'il est fermé
+        $("#add-sensor-modal").on("hidden.bs.modal", function () {
+            // Réinitialiser les valeurs du formulaire lorsqu'il est fermé
+            $("#sensor-name, #api-key").val("");
+        });
+
+        // Configuration des graphiques
+var temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
+var temperatureChart = new Chart(temperatureCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Température',
+            data: [],
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            fill: false,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+        }]
+    },
+    options: {
+        responsive: true,
+        title: {
+            display: true,
+            text: 'Température',
+            fontSize: 18,
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    fontSize: 14,
+                },
+                gridLines: {
+                    display: true,
+                    color: 'rgba(0, 0, 0, 0.1)',
+                },
+            }],
+            xAxes: [{
+                gridLines: {
+                    display: false,
+                },
+            }]
+        },
+        animation: {
+            duration: 1000,
+        },
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+        },
+        legend: {
+            display: true,
+            labels: {
+                fontSize: 14,
+            },
+        },
+    }
+});
+
+
+
+var lightIntensityCtx = document.getElementById('lightIntensityChart').getContext('2d');
+var lightIntensityChart = new Chart(lightIntensityCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Intensité Lumineuse',
+            data: [],
+            borderColor: 'rgba(255, 99, 132, 1)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            fill: false,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+        }]
+    },
+    options: {
+        responsive: true,
+        title: {
+            display: true,
+            text: 'Intensité Lumineuse',
+            fontSize: 18,
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    fontSize: 14,
+                },
+                gridLines: {
+                    display: true,
+                    color: 'rgba(0, 0, 0, 0.1)',
+                },
+            }],
+            xAxes: [{
+                gridLines: {
+                    display: false,
+                },
+            }]
+        },
+        animation: {
+            duration: 1000,
+        },
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+        },
+        legend: {
+            display: true,
+            labels: {
+                fontSize: 14,
+            },
+        },
+    }
+});
+
+
+
+var soilMoistureCtx = document.getElementById('soilMoistureChart').getContext('2d');
+var soilMoistureChart = new Chart(soilMoistureCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Humidité du Sol',
+            data: [],
+            borderColor: 'rgba(255, 206, 86, 1)',
+            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+            fill: false,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+        }]
+    },
+    options: {
+        responsive: true,
+        title: {
+            display: true,
+            text: 'Humidité du Sol',
+            fontSize: 18,
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    fontSize: 14,
+                },
+                gridLines: {
+                    display: true,
+                    color: 'rgba(0, 0, 0, 0.1)',
+                },
+            }],
+            xAxes: [{
+                gridLines: {
+                    display: false,
+                },
+            }]
+        },
+        animation: {
+            duration: 1000,
+        },
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+        },
+        legend: {
+            display: true,
+            labels: {
+                fontSize: 14,
+            },
+        },
+    }
+});
+
+
+
+var gasConcentrationCtx = document.getElementById('gasConcentrationChart').getContext('2d');
+var gasConcentrationChart = new Chart(gasConcentrationCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Concentration de Gaz',
+            data: [],
+            borderColor: 'rgba(153, 102, 255, 1)',
+            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+            fill: false,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+        }]
+    },
+    options: {
+        responsive: true,
+        title: {
+            display: true,
+            text: 'Concentration de Gaz',
+            fontSize: 18,
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    fontSize: 14,
+                },
+                gridLines: {
+                    display: true,
+                    color: 'rgba(0, 0, 0, 0.1)',
+                },
+            }],
+            xAxes: [{
+                gridLines: {
+                    display: false,
+                },
+            }]
+        },
+        animation: {
+            duration: 1000,
+        },
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+        },
+        legend: {
+            display: true,
+            labels: {
+                fontSize: 14,
+            },
+        },
+    }
+});
+
+
+
+// Fonction pour mettre à jour le graphique avec les données les plus récentes
+function updateChartWithLatestData(chart, label, newData) {
+    // Supprimez les points de données les plus anciens si le nombre de points dépasse la limite
+    if (chart.data.labels.length > 10) {
+        chart.data.labels.shift();
+        chart.data.datasets.forEach((dataset) => {
+            dataset.data.shift();
+        });
+    }
+
+    // Ajoutez le nouveau point de données
+    chart.data.labels.push(label);
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(newData);
+    });
+
+    // Mettez à jour le graphique
+    chart.update();
+}
+
+// Fonction pour mettre à jour les valeurs des capteurs
+function updateSensorValues(data) {
+    var temperatureValue = data.temperature;
+    var lightIntensityValue = data.lightIntensity;
+    var soilMoistureValue = data.soilMoisture;
+    var gasConcentrationValue = data.gasConcentration;
+
+    document.getElementById('temperatureDisplay').textContent = temperatureValue;
+    document.getElementById('lightIntensityDisplay').textContent = lightIntensityValue;
+    document.getElementById('soilMoistureDisplay').textContent = soilMoistureValue;
+    document.getElementById('gasConcentrationDisplay').textContent = gasConcentrationValue;
+}
+
+// Écouteur d'événements Firebase pour mettre à jour les graphiques en temps réel
+ref.on("child_added", function(snapshot) {
+    var childData = snapshot.val();
+    updateSensorValues(childData);
+    var timestamp = snapshot.key;
+
+    // Mettez à jour chaque graphique avec le dernier point de données
+    updateChartWithLatestData(temperatureChart, timestamp, childData.temperature);
+    updateChartWithLatestData(lightIntensityChart, timestamp, childData.lightIntensity);
+    updateChartWithLatestData(soilMoistureChart, timestamp, childData.soilMoisture);
+    updateChartWithLatestData(gasConcentrationChart, timestamp, childData.gasConcentration);
+});
+
+      });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Récupérer le nom de l'utilisateur de LocalStorage
+    const userName = localStorage.getItem('userName');
+
+    // Vérifier si un nom d'utilisateur a été stocké
+    if (userName) {
+        // Afficher le nom de l'utilisateur dans la barre de navigation
+        const userNavItem = document.getElementById('userNavItem');
+        userNavItem.innerHTML = `<a class="nav-link" href="#">${userName}</a>`;
+
+        // Afficher un message de bienvenue pour l'utilisateur connecté
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        welcomeMessage.textContent = `Bienvenue, ${userName} !`;
+    }
+});
+
+ </script>
+</body>
+
+</html>

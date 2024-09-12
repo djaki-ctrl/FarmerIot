@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page de Connexion</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Lien vers votre fichier CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <a href="accueil.html" style="text-align: center;">
+            <h2>Connexion</h2>
+        </a>
+        <form  class="login" id="login-Form">
+            <label for="email">Email :</label>
+            <input type="email" id="email" name="email" autocomplete="off" placeholder="Entrez votre email" required>
+            <div id="passwordField" class="password-container">
+                <label for="password">Mot de passe :</label>
+                <input type="password" id="password" name="password" placeholder="Entrez votre mot de passe" autocomplete="new-password" required>
+                <span class="icon-container">
+                    <i class="fa fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
+                </span>
+            </div>
+            
+            <button type="submit">Se Connecter</button>
+            <p id="errorMessage" class="error-message"><p>
+        </form>
+        <div class="additional-options">
+            <a href="mot-de-passe-oublie.html">Mot de passe oublié !</a>
+            <a href="inscription.html">Formulaire d'inscription ! </a> <!-- Lien vers la page de récupération de mot de passe -->
+        </div>
+    </div>
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+
+    <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-analytics.js"></script>
+    
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+    
+<script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const firebaseConfig = {
+                apiKey: "AIzaSyAuppdI3nS-GDaM7wC1uB9mhIzonB1STNE",
+                authDomain: "esp32firebase-cac38.firebaseapp.com",
+                databaseURL: "https://esp32firebase-cac38-default-rtdb.firebaseio.com",
+                projectId: "esp32firebase-cac38",
+                storageBucket: "esp32firebase-cac38.appspot.com",
+                messagingSenderId: "904491983155",
+                appId: "1:904491983155:web:9278c9a444cc75eecdde46"
+            };
+        
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+        
+            // Initialize Firebase Authentication
+            const auth = firebase.auth();
+        
+            // Initialize Firestore
+            const db = firebase.firestore();
+        
+    // Fonction pour afficher les messages d'erreur
+    function displayErrorMessage(errorMessage, errorElementId = 'errorMessage') {
+        const errorElement = document.getElementById(errorElementId);
+        if (errorElement) {
+            errorElement.textContent = errorMessage;
+            errorElement.classList.add('error-message');
+        } else {
+            console.error(`Élément avec l'ID '${errorElementId}' non trouvé.`);
+        }
+    }
+
+    const loginForm = document.querySelector(".login");
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const email = loginForm.email.value;
+        const password = loginForm.password.value;
+
+        auth.signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                console.log("Utilisateur connecté :", userCredential.user);
+                console.log("UID de l'utilisateur :", userCredential.user.uid);
+                return db.collection('utilisateurs').doc(userCredential.user.uid).get();
+            })
+            .then((doc) => {
+    if (doc.exists) {
+        const userData = doc.data();
+        const userRole = userData.role;
+        const userName = userData.nom;
+        let redirectUrl;
+
+        if (userRole === 'admin') {
+            redirectUrl = 'dashboardAdmin.html';
+        } else if (userRole === 'user') {
+            redirectUrl = 'dashboard.html';
+        } else {
+            console.error('Rôle d\'utilisateur inconnu :', userRole);
+            // Gérer les rôles inconnus comme nécessaire
+            displayErrorMessage('Rôle d\'utilisateur inconnu. Veuillez contacter le support.');
+            // Rediriger vers une page spécifique pour les rôles inconnus
+            redirectUrl = 'roleNotFound.html';
+        }
+
+        localStorage.setItem('userName', userName);
+        window.location.href = redirectUrl;
+    } else {
+        console.error('Aucune donnée d\'utilisateur trouvée pour cet utilisateur.');
+        displayErrorMessage('Aucune donnée d\'utilisateur trouvée. Veuillez contacter le support.');
+        // Rediriger vers une page spécifique si aucune donnée d'utilisateur n'est trouvée
+        window.location.href = 'userNotFound.html';
+    }
+})
+
+            .catch((error) => {
+                let errorCode, errorMessage;
+                
+                // Vérifier si l'erreur est dans le format JSON attendu
+                
+                if (error.error && error.error.code && error.error.message) {
+                    errorCode = error.error.code;
+                    errorMessage = error.error.message;
+                } else {
+                     // Gestion des erreurs standard de Firebase
+                     errorCode = error.code;
+                     errorMessage = error.message;
+                    }
+
+    console.log("Erreur de connexion :", errorMessage);
+
+    if (errorCode === 'auth/wrong-password') {
+        displayErrorMessage('Mot de passe incorrect. Veuillez réessayer.');
+    } else if (errorCode === 'auth/user-not-found') {
+        displayErrorMessage('Utilisateur non trouvé. Veuillez vérifier votre email.');
+    } else if (errorCode === 'INVALID_LOGIN_CREDENTIALS') {
+        // Gérer l'erreur INVALID_LOGIN_CREDENTIALS spécifique
+        displayErrorMessage('Identifiants de connexion invalides. Veuillez vérifier votre email et votre mot de passe.');
+    } else {
+        // Gérer les autres erreurs génériquement
+        displayErrorMessage(errorMessage);
+    }
+});
+
+    });
+});
+</script>
+    
+    
+    
+    
+    <script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const toggleButton = document.querySelector('.toggle-password');
+    
+        // Change the input type of the password between "password" and "text"
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+    
+        // Change the icon/button based on the current input type
+        toggleButton.classList.toggle('fa-eye-slash'); // Add the class for the crossed eye icon
+        toggleButton.classList.toggle('fa-eye'); // Remove the class for the eye icon
+    }
+    </script>
+    
+</body>
+</html>

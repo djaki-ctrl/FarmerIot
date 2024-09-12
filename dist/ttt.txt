@@ -1,0 +1,237 @@
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc, serverTimestamp, getDocs, deleteDoc, doc, updateDoc, getDoc } from "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAFBon2ZjU1patYlYoitycfYYED71XduPo",
+  authDomain: "fir-691e8.firebaseapp.com",
+  projectId: "fir-691e8",
+  storageBucket: "fir-691e8.appspot.com",
+  messagingSenderId: "944321471274",
+  appId: "1:944321471274:web:b9126bd1020bd203b57453"
+};
+
+// Initialisation de l'application Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+// Obtenez une référence à la base de données Firestore
+const db = getFirestore(app);
+
+// Sélectionnez la référence à la collection "utilisateurs"
+const userRef = collection(db, "utilisateurs");
+
+// Sélectionnez le formulaire d'ajout d'utilisateur
+// Sélectionnez le formulaire d'ajout d'utilisateur
+const addUserForm = document.querySelector(".Ajouter");
+if (addUserForm) {
+ // Ajoutez un écouteur d'événements pour le formulaire
+ addUserForm.addEventListener("submit", async (e) => {
+    e.preventDefault(); // Empêche le formulaire de faire une requête HTTP
+
+    try {
+      // Créer un compte utilisateur dans Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, addUserForm.email.value, addUserForm.password.value);
+      const user = userCredential.user;
+
+      // Ajoutez un document utilisateur à Firestore avec les données du formulaire
+      await addDoc(userRef, {
+        uid: user.uid, // Ajoutez l'UID de l'utilisateur Firebase Authentication
+        nom: addUserForm.nom.value,
+        prenom: addUserForm.prenom.value,
+        email: addUserForm.email.value,
+        dateDajout: serverTimestamp(),
+      });
+      
+      // Réinitialiser le formulaire après l'ajout de l'utilisateur
+      addUserForm.reset();
+      
+      console.log("Utilisateur ajouté avec succès !");
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de l'utilisateur :", error);
+    }
+ });
+} else {
+ console.error("Le formulaire d'ajout d'utilisateur n'a pas été trouvé.");
+}
+
+
+// Fonction pour afficher la liste des utilisateurs dans le tableau
+// Function to display users
+async function afficherListeUtilisateurs() {
+  const userList = document.querySelector("#userList tbody");
+  userList.innerHTML = ""; // Clear previous content
+ 
+  try {
+     const snapshot = await getDocs(collection(db, "utilisateurs"));
+     snapshot.forEach((doc) => {
+       const user = doc.data();
+       const userRow = `
+         <tr class="user" data-user-id="${doc.id}">
+           <td class="username">${user.nom} ${user.prenom}</td>
+           <td class="email">${user.email}</td>
+           <td class="role">${user.role}</td>
+           <td class="userActions">
+             <button class="editBtn btn btn-info btn-action" data-toggle="modal" data-target="#editUserModal">Modifier</button>
+             <button class="deleteBtn btn btn-danger btn-action" data-user-id="${doc.id}">Supprimer</button>
+           </td>
+         </tr>`;
+       userList.innerHTML += userRow;
+     });
+  } catch (error) {
+     console.error("Erreur lors de la récupération des utilisateurs :", error);
+  }
+ }
+ 
+ // Attach event listeners to delete buttons
+ function attachDeleteButtonListeners() {
+  document.querySelector("#userList").addEventListener('click', function(event) {
+     if (event.target.classList.contains('deleteBtn')) {
+       const userId = event.target.getAttribute('data-user-id');
+       supprimerUser(userId).catch(error => console.error("Erreur lors de l'appel de supprimerUser :", error));
+     }
+  });
+ }
+ 
+ // Function to delete a user
+ async function supprimerUser(userId) {
+  const confirmation = confirm("Voulez-vous vraiment supprimer cet utilisateur ?");
+  if (confirmation) {
+     try {
+       await deleteDoc(doc(db, "utilisateurs", userId));
+       console.log("Utilisateur supprimé avec succès !");
+       afficherListeUtilisateurs(); // Update the list after deletion
+     } catch (error) {
+       console.error("Erreur lors de la suppression de l'utilisateur :", error);
+     }
+  }
+ }
+ 
+ // Attach event listeners to edit buttons
+ document.querySelectorAll('.editBtn').forEach(button => {
+  button.addEventListener('click', function() {
+     const userId = this.closest('.user').getAttribute('data-user-id');
+     const userDoc = doc(db, "utilisateurs", userId);
+ 
+     getDoc(userDoc).then((docSnapshot) => {
+       if (docSnapshot.exists()) {
+         const userData = docSnapshot.data();
+ 
+         // Populate the modal form with user data
+         document.querySelector('#editUsername').value = userData.nom;
+         document.querySelector('#editEmail').value = userData.email;
+         document.querySelector('#editRole').value = userData.role;
+         // Add a hidden input field to store the user ID
+         document.querySelector('#editUserForm').insertAdjacentHTML('beforeend', `<input type="hidden" id="userId" name="userId" value="${userId}">`);
+ 
+         // Show the modal
+         $('#editUserModal').modal('show');
+       } else {
+         console.log("No such document!");
+       }
+     }).catch((error) => {
+       console.log("Error getting document:", error);
+     });
+  });
+ });
+ 
+ // Function to handle the form submission for updating the user's data
+ document.querySelector('#editUserForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+ 
+  const userId = document.querySelector('#userId').value;
+  const userDoc = doc(db, "utilisateurs", userId);
+ 
+  try {
+     await updateDoc(userDoc, {
+       nom: document.querySelector('#editUsername').value,
+       email: document.querySelector('#editEmail').value,
+       role: document.querySelector('#editRole').value,
+     });
+ 
+     console.log("Utilisateur modifié avec succès !");
+     // Optionally, refresh the user list to reflect the changes
+     afficherListeUtilisateurs();
+  } catch (error) {
+     console.error("Erreur lors de la modification de l'utilisateur :", error);
+  }
+ });
+ 
+ // Call the function to display users
+ afficherListeUtilisateurs().then(() => {
+  attachDeleteButtonListeners(); // Attach event listeners after the list is updated
+ });
+
+ function signInUser(email, password) {
+  signInWithEmailAndPassword(auth, email, password)
+     .then((userCredential) => {
+       // L'utilisateur s'est connecté avec succès
+       const user = userCredential.user;
+       console.log("User signed in:", user);
+       // Redirigez l'utilisateur vers une autre page ou mettez à jour l'UI ici
+       window.location.href = 'dashboard.html'; // Redirection vers index.html
+     })
+     .catch((error) => {
+       // Une erreur s'est produite lors de la tentative de connexion
+       const errorCode = error.code;
+       let errorMessage = 'Une erreur s\'est produite lors de la connexion.';
+ 
+       // Gestion des erreurs spécifiques
+       switch (errorCode) {
+         case 'auth/invalid-email':
+           errorMessage = 'L\'adresse email est invalide.';
+           break;
+         case 'auth/user-disabled':
+           errorMessage = 'Le compte utilisateur a été désactivé.';
+           break;
+         case 'auth/user-not-found':
+           errorMessage = 'Aucun compte trouvé avec cette adresse email.';
+           break;
+         case 'auth/wrong-password':
+           errorMessage = 'Le mot de passe est incorrect.';
+           break;
+         default:
+           errorMessage = 'Une erreur inattendue s\'est produite.';
+       }
+ 
+       console.error("Error signing in:", errorCode, errorMessage);
+       // Affichez un message d'erreur à l'utilisateur
+       document.getElementById('errorMessage').textContent = errorMessage;
+     });
+ }
+ 
+ window.signInUser = signInUser; // Rendre la fonction accessible globalement
+ 
+ document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('loginForm').addEventListener('submit', function(event) {
+     event.preventDefault(); // Empêche le comportement par défaut du formulaire
+     const email = document.getElementById('email').value;
+     const password = document.getElementById('password').value;
+     signInUser(email, password);
+  });
+ });
+ 
+ // Vérifie si l'utilisateur est déjà connecté
+ onAuthStateChanged(auth, (user) => {
+  if (user) {
+     // L'utilisateur est connecté, redirigez-le vers index.html
+     window.location.href = 'dashboard.html';
+  } else {
+     // L'utilisateur n'est pas connecté, ne faites rien pour l'instant
+     // Vous pouvez afficher un message d'erreur ou mettre à jour l'UI ici si nécessaire
+  }
+ });
+ 
+ // Fonction pour basculer la visibilité du mot de passe
+ function togglePasswordVisibility() {
+  const passwordInput = document.getElementById('password');
+  const toggleButton = document.querySelector('.toggle-password');
+ 
+  const type = passwordInput.type === 'password' ? 'text' : 'password';
+  passwordInput.type = type;
+ 
+  toggleButton.classList.toggle('fa-eye-slash');
+  toggleButton.classList.toggle('fa-eye');
+ }
+ 
+

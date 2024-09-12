@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistiques du Champ</title>
+ 
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+ 
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+ 
+  <!-- Popper.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+ 
+  <!-- Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+ 
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ 
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+ 
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+ </head>
+ 
+
+  <style>
+/* Réduction de la répétition en utilisant des variables CSS pour les couleurs et les tailles */
+:root {
+ --main-bg-color: #f8f9fa;
+ --main-text-color: #333;
+ --navbar-bg-color: #4CAF50;
+ --navbar-hover-color: #45a049;
+ --sensor-info-bg-color: #fff;
+ --sensor-info-hover-color: #4CAF50;
+ --footer-bg-color: #4CAF50;
+ --footer-text-color: white;
+ --logout-btn-bg-color: #379422;
+ --logout-btn-hover-color: #2e7d22;
+}
+
+body {
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ margin: 0;
+ padding: 0;
+ background-color: var(--main-bg-color);
+ color: var(--main-text-color);
+ min-height: calc(100vh - 100px);
+}
+
+.navbar {
+ background-color: var(--navbar-bg-color);
+ padding: 15px;
+ text-align: center;
+}
+
+.navbar a {
+ color: white;
+ text-decoration: none;
+ padding: 14px 8px;
+ display: inline-block;
+}
+
+.navbar a:hover {
+ background-color: var(--navbar-hover-color);
+}
+
+.container {
+ position: relative;
+}
+
+@keyframes breathe {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.sensor-info {
+ background-color: var(--sensor-info-bg-color);
+ padding: 20px;
+ border-radius: 10px;
+ box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+ transition: transform 0.8s;
+ cursor: pointer;
+ margin-bottom: 30px;
+ animation: breathe 4s infinite alternate;
+}
+
+.sensor-info:hover {
+ transform: scale(1.13);
+}
+
+.sensor-info h3 {
+ font-size: 36px;
+ margin-bottom: 10px;
+ color: var(--sensor-info-hover-color);
+}
+
+.sensor-info p {
+ color: var(--sensor-info-hover-color);
+}
+
+.sensor-info p.second-text {
+ font-size: 0.9em;
+}
+
+.chart-container {
+ position: relative;
+ margin: auto;
+ height: 200px;
+ width: 100%;
+}
+
+footer {
+ background-color: var(--footer-bg-color);
+ color: var(--footer-text-color);
+ text-align: center;
+ padding: 10px;
+ width: 100%;
+}
+
+footer a {
+ color: var(--footer-text-color);
+ text-decoration: none;
+}
+
+.sensor-details {
+ display: none;
+}
+
+.sensor-info.active {
+ position: fixed;
+ top: 10%;
+ left: 10%;
+ margin-top: 100px;
+ margin-left: 120px;
+ transform: translate(-50%, -50%);
+ z-index: 1000;
+ width: 60vw;
+ max-height: 120vh;
+ overflow-y: auto;
+ background-color: rgba(255, 255, 255, 0.9);
+ border-radius: 10px;
+ box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Style pour le bouton de déconnexion */
+.logout-btn {
+ color: white;
+ text-decoration: none;
+ padding: 10px 20px;
+ background-color: var(--logout-btn-bg-color);
+ border: none;
+ border-radius: 50px;
+ transition: background-color 0.3s;
+ position: relative;
+}
+
+.logout-btn::after {
+ content: "Déconnexion";
+ position: absolute;
+ top: 50%;
+ left: calc(100% + 10px);
+ transform: translateY(-50%);
+ white-space: nowrap;
+ background-color: var(--logout-btn-bg-color);
+ color: white;
+ border-radius: 5px;
+ transition: opacity 0.3s, transform 0.3s;
+ opacity: 0;
+ pointer-events: none;
+}
+
+.logout-btn:hover::after {
+ opacity: 1;
+ transform: translateY(-50%) translateX(10px);
+}
+
+/* Style pour l'icône de déconnexion */
+.logout-btn .bi {
+ margin-right: 5px;
+ font-size: 1.2em;
+ vertical-align: auto;
+ margin-left: 4px;
+}
+
+/* Style par défaut pour les .chart-container */
+/* Style par défaut pour les .chart-container */
+.chart-container {
+    position: relative;
+    margin: 20px 0; /* Ajoutez des marges pour l'espacement vertical */
+    padding-bottom: 50%; /* Maintenez l'aspect ratio des canvases */
+    height: 0; /* Assurez-vous que le conteneur n'a pas de hauteur propre */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: box-shadow 0.3s ease;
+    border-radius: 5px;
+    overflow: hidden; /* Cache les parties des canvases dépassant du conteneur */
+}
+
+.chart-container canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+@media (max-width: 576px) {
+    .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+:root {
+ --transition-duration: 0.3s;
+ --transition-easing: ease;
+ --light-background: #f9f9f9;
+ --dark-background: #f1f1f1;
+ --text-color: #000;
+ --hover-text-color: #333;
+ --primary-color: #4CAF50;
+ --hover-primary-color: #45a049;
+ --box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.analysis-tab {
+ position: absolute;
+ background-color: var(--light-background);
+ min-width: 160px;
+ box-shadow: var(--box-shadow);
+ border-radius: 5px;
+ padding: 12px 16px;
+ z-index: 1;
+ opacity: 0;
+ transition: opacity var(--transition-duration) var(--transition-easing), background-color var(--transition-duration) var(--transition-easing), color var(--transition-duration) var(--transition-easing), box-shadow var(--transition-duration) var(--transition-easing);
+}
+
+.analysis-tab.show {
+ opacity: 1;
+}
+
+.analysis-tab a {
+ color: var(--text-color);
+ padding: 12px 16px;
+ text-decoration: none;
+ display: block;
+ text-align: left;
+ transition: background-color var(--transition-duration) var(--transition-easing), color var(--transition-duration) var(--transition-easing);
+}
+
+.analysis-tab a:hover {
+ background-color: var(--dark-background);
+ color: var(--hover-text-color);
+}
+
+.fas.fa-info-circle {
+ color: var(--primary-color);
+ cursor: pointer;
+ position: fixed;
+ right: 20px;
+ top: 20px;
+ transition: color var(--transition-duration) var(--transition-easing), transform var(--transition-duration) var(--transition-easing), box-shadow var(--transition-duration) var(--transition-easing);
+ box-shadow: var(--box-shadow);
+}
+
+.fas.fa-info-circle:hover {
+ color: var(--hover-primary-color);
+ transform: scale(1.1);
+ box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+@media (max-width: 768px) {
+ .fas.fa-info-circle {
+    right: 10px;
+    top: 10px;
+ }
+}
+
+
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="dashboard.html"><i class="bi bi-house-door"></i> Accueil</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="statistiques.html"><i class="bi bi-bar-chart-line"></i> Statistiques</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        <i class="bi bi-speedometer2"></i> Capteurs
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#temperature"><i class="bi bi-thermometer"></i> Température</a></li>
+                        <li><a class="dropdown-item" href="#lightIntensity"><i class="bi bi-brightness-high"></i> Intensité Lumineuse</a></li>
+                        <li><a class="dropdown-item" href="#soilMoisture"><i class="bi bi-cloud-rain"></i> Humidité du Sol</a></li>
+                        <li><a class="dropdown-item" href="#gasConcentration"><i class="bi bi-cloud"></i> Concentration de Gaz</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="info.html"><i class="bi bi-info-circle"></i> Infos</a>
+                </li>
+                <li id="userNavItem" class="nav-item">
+                    <!-- Le nom de l'utilisateur connecté sera inséré ici -->
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link logout-btn" href="#" id="logoutBtn">
+                        <i class="bi bi-power"></i> <!-- Icône de déconnexion -->
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container">
+    <h2 class="mb-4">Statistiques des Capteurs</h2>
+   
+    <!-- Température et Intensité Lumineuse -->
+    <div class="row">
+         <div class="col-12 col-md-6">
+             <div class="sensor-info temperature" data-sensor-type="temperature" onclick="toggleSensorInfo(this)">
+                 <i class="fas fa-info-circle" onmouseover="showAnalysis('temperature', this)" onmouseout="hideAnalysis()"></i>
+                 <h3><i class="bi bi-thermometer"></i></h3>
+                 <p>Température</p>
+                 <p class="second-text">Données en temps réel</p>
+                 <p style="text-align: right;">Température: <span id="temperatureDisplay"></span>°C</p>
+                 <div class="chart-container">
+                    <canvas id="temperatureChart"></canvas>
+                 </div>
+                 <div class="sensor-details">
+                    <p id="temperatureDisplay"></p>
+                 </div>
+             </div>
+         </div>
+         <div class="col-12 col-md-6">
+             <div class="sensor-info lightIntensity" data-sensor-type="lightIntensity" onclick="toggleSensorInfo(this)">
+                 <i class="fas fa-info-circle" onmouseover="showAnalysis('lightIntensity', this)" onmouseout="hideAnalysis()"></i>            
+                 <h3><i class="bi bi-brightness-high"></i></h3>
+                 <p>Intensité Lumineuse</p>
+                 <p class="second-text">Données en temps réel</p>
+                 <p style="text-align: right;">Intensité Lumineuse: <span id="lightIntensityDisplay"></span> lux</p>
+                 <div class="chart-container">
+                    <canvas id="lightIntensityChart"></canvas>
+                 </div>
+                 <div class="sensor-details">
+                    <p id="lightIntensityDisplay"></p>
+                 </div>
+             </div>
+         </div>
+    </div>
+   
+    <!-- Humidité du Sol et Concentration de Gaz -->
+    <div class="row">
+         <div class="col-12 col-md-6">
+             <div class="sensor-info soilMoisture" data-sensor-type="soilMoisture" onclick="toggleSensorInfo(this)">
+                 <i class="fas fa-info-circle" onmouseover="showAnalysis('soilMoisture', this)" onmouseout="hideAnalysis()"></i>
+                 <h3><i class="bi bi-cloud-rain"></i></h3>
+                 <p>Humidité du Sol</p>
+                 <p class="second-text">Données en temps réel</p>
+                 <p style="text-align: right;">Humidité du Sol: <span id="soilMoistureDisplay"></span> %</p>
+                 <div class="chart-container">
+                    <canvas id="soilMoistureChart"></canvas>
+                 </div>
+                 <div class="sensor-details">
+                    <p id="soilMoistureDisplay"></p>
+                 </div>
+             </div>
+         </div>
+         <div class="col-12 col-md-6">
+             <div class="sensor-info gasConcentration" data-sensor-type="gasConcentration" onclick="toggleSensorInfo(this)">
+                 <i class="fas fa-info-circle" onmouseover="showAnalysis('gasConcentration', this)" onmouseout="hideAnalysis()"></i>
+                 <h3><i class="bi bi-cloud"></i></h3>
+                 <p>Concentration de Gaz</p>
+                 <p class="second-text">Données en temps réel</p>
+                 <p style="text-align: right;">Concentration de Gaz: <span id="gasConcentrationDisplay"></span> ppm</p>
+                 <div class="chart-container">
+                    <canvas id="gasConcentrationChart"></canvas>
+                 </div>
+                 <div class="sensor-details">
+                    <p id="gasConcentrationDisplay"></p>
+                 </div>
+             </div>
+         </div>
+    </div>
+  </div>
+  
+
+
+
+
+
+  <footer class="mt-5">
+    <p>Site développé par <a href="#"><img src="url_votre_logo.png" alt="Logo" class="footer-logo">Votre Nom</a> | Suivez-nous sur 
+      <a href="#"><i class="fab fa-facebook"></i></a> 
+      <a href="#"><i class="fab fa-twitter"></i></a> 
+      <a href="#"><i class="fab fa-instagram"></i></a>
+    </p>
+  </footer>
+  
+<script>
+    function toggleSensorInfo(element) {
+      var $this = $(element);
+      if ($this.hasClass("active")) {
+        $this.removeClass("active");
+      } else {
+        $(".sensor-info").removeClass("active");
+        $this.addClass("active");
+      }
+    }
+
+  //deconnexion
+    // Logique de déconnexion
+    var logoutBtn = document.getElementById('logoutBtn');
+  
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function () {
+      // Ajoutez votre logique de déconnexion ici, par exemple :
+      // Redirection vers la page de connexion
+      window.location.href = 'connexion.html';
+    });
+  }
+</script>
+<script>
+  // Configuration de Firebase
+  const firebaseConfig = {
+  apiKey: "AIzaSyAuppdI3nS-GDaM7wC1uB9mhIzonB1STNE",
+  authDomain: "esp32firebase-cac38.firebaseapp.com",
+  databaseURL: "https://esp32firebase-cac38-default-rtdb.firebaseio.com",
+  projectId: "esp32firebase-cac38",
+  storageBucket: "esp32firebase-cac38.appspot.com",
+  messagingSenderId: "904491983155",
+  appId: "1:904491983155:web:9278c9a444cc75eecdde46"
+};
+  // Initialisation de Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  var db = firebase.database();
+  var ref = db.ref("sensorData");
+
+  // Variables pour stocker les valeurs des capteurs
+let temperatureValue = 0;
+let lightIntensityValue = 0;
+let soilMoistureValue = 0;
+let gasConcentrationValue = 0;
+
+// Fonction pour mettre à jour les valeurs des capteurs et l'affichage
+function updateSensorValues(data) {
+  temperatureValue = data.temperature;
+  lightIntensityValue = data.lightIntensity;
+  soilMoistureValue = data.soilMoisture;
+  gasConcentrationValue = data.gasConcentration;
+
+  document.getElementById('temperatureDisplay').textContent = temperatureValue;
+  document.getElementById('lightIntensityDisplay').textContent = lightIntensityValue;
+  document.getElementById('soilMoistureDisplay').textContent = soilMoistureValue;
+  document.getElementById('gasConcentrationDisplay').textContent = gasConcentrationValue;
+}
+
+
+  // Configuration des graphiques
+  var temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
+  var temperatureChart = new Chart(temperatureCtx, {
+      type: 'line',
+      data: {
+          labels: [],
+          datasets: [{
+              label: 'Température',
+              data: [],
+              borderColor: 'rgba(75, 192, 192, 1)',
+              fill: false
+          }]
+      },
+      options: {
+          responsive: true,
+          title: {
+              display: true,
+              text: 'Température'
+          }
+      }
+  });
+
+  var lightIntensityCtx = document.getElementById('lightIntensityChart').getContext('2d');
+  var lightIntensityChart = new Chart(lightIntensityCtx, {
+      type: 'line',
+      data: {
+          labels: [],
+          datasets: [{
+              label: 'Intensité Lumineuse',
+              data: [],
+              borderColor: 'rgba(255, 99, 132, 1)',
+              fill: false
+          }]
+      },
+      options: {
+          responsive: true,
+          title: {
+              display: true,
+              text: 'Intensité Lumineuse'
+          }
+      }
+  });
+
+  var soilMoistureCtx = document.getElementById('soilMoistureChart').getContext('2d');
+  var soilMoistureChart = new Chart(soilMoistureCtx, {
+      type: 'line',
+      data: {
+          labels: [],
+          datasets: [{
+              label: 'Humidité du Sol',
+              data: [],
+              borderColor: 'rgba(255, 206, 86, 1)',
+              fill: false
+          }]
+      },
+      options: {
+          responsive: true,
+          title: {
+              display: true,
+              text: 'Humidité du Sol'
+          }
+      }
+  });
+
+  var gasConcentrationCtx = document.getElementById('gasConcentrationChart').getContext('2d');
+  var gasConcentrationChart = new Chart(gasConcentrationCtx, {
+      type: 'line',
+      data: {
+          labels: [],
+          datasets: [{
+              label: 'Concentration de Gaz',
+              data: [],
+              borderColor: 'rgba(153, 102, 255, 1)',
+              fill: false
+          }]
+      },
+      options: {
+          responsive: true,
+          title: {
+              display: true,
+              text: 'Concentration de Gaz'
+          }
+      }
+  });
+
+  // Récupération des données de Firebase et mise à jour des graphiques
+  ref.on("value", function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+          var childData = childSnapshot.val();
+          updateSensorValues(childData);
+          var timestamp = childSnapshot.key;
+          temperatureChart.data.labels.push(timestamp);
+          temperatureChart.data.datasets[0].data.push(childData.temperature);
+          temperatureChart.update();
+
+          lightIntensityChart.data.labels.push(timestamp);
+          lightIntensityChart.data.datasets[0].data.push(childData.lightIntensity);
+          lightIntensityChart.update();
+
+          soilMoistureChart.data.labels.push(timestamp);
+          soilMoistureChart.data.datasets[0].data.push(childData.soilMoisture);
+          soilMoistureChart.update();
+
+          gasConcentrationChart.data.labels.push(timestamp);
+          gasConcentrationChart.data.datasets[0].data.push(childData.gasConcentration);
+          gasConcentrationChart.update();
+      });
+  });
+  // Initialize Firebase (assuming you've already done this elsewhere in your project)
+// firebase.initializeApp(firebaseConfig);
+
+// Function to update the user name in the navigation bar
+function updateUserName() {
+ // Get the current user
+ const user = firebase.auth().currentUser;
+
+ // Check if a user is logged in
+ if (user) {
+    // Get the user's display name
+    const userName = user.displayName;
+
+    // Find the user name placeholder in the DOM
+    const userNavItem = document.getElementById('userNavItem');
+
+    // Update the placeholder with the user's name
+    userNavItem.innerHTML = `<a class="nav-link" href="#">${userName}</a>`;
+ }
+}
+
+// Call the function to update the user name when the page loads
+document.addEventListener('DOMContentLoaded', updateUserName);
+
+</script>
+<script>
+  function resizeCanvas(canvas) {
+    // Obtenez la taille du conteneur
+    const container = canvas.parentElement;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    // Redimensionnez le canvas pour qu'il corresponde à la taille du conteneur
+    canvas.width = containerWidth;
+    canvas.height = containerHeight;
+}
+
+// Sélectionnez tous les canvases
+const canvases = document.querySelectorAll('canvas');
+
+// Redimensionnez chaque canvas pour correspondre à la taille de son conteneur
+canvases.forEach(resizeCanvas);
+
+// Ajoutez un écouteur d'événements pour redimensionner les canvases lorsque la fenêtre est redimensionnée
+window.addEventListener('resize', () => {
+    canvases.forEach(resizeCanvas);
+});
+
+
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+     const userName = localStorage.getItem('userName');
+     if (userName) {
+         const userNavItem = document.getElementById('userNavItem');
+         userNavItem.innerHTML = `
+             <div class="dropdown">
+                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                     Bienvenue, ${userName}!
+                 </a>
+                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                     <a class="dropdown-item" href="#">Profil</a>
+                     <a class="dropdown-item" href="#">Paramètres</a>
+                     <div class="dropdown-divider"></div>
+                     <a class="dropdown-item" href="#">Déconnexion</a>
+                 </div>
+             </div>
+         `;
+     }
+ });
+ function adjustAnalysisTabPosition(analysisTab, rect) {
+    // Obtenir la largeur et la hauteur de l'onglet d'analyse
+    var analysisTabWidth = analysisTab.offsetWidth;
+    var analysisTabHeight = analysisTab.offsetHeight;
+
+    // Obtenir la largeur et la hauteur de la fenêtre du navigateur
+    var windowWidth = window.innerWidth;
+    var windowHeight = window.innerHeight;
+
+    // Calculer la position horizontale de l'onglet d'analyse
+    var leftPosition = rect.left;
+
+    // Vérifier si l'onglet dépasse le bord droit de l'écran
+    if (leftPosition + analysisTabWidth > windowWidth) {
+        // Ajuster la position horizontale pour que l'onglet reste entièrement visible à l'écran
+        leftPosition = windowWidth - analysisTabWidth;
+    }
+
+    // Calculer la position verticale de l'onglet d'analyse
+    var topPosition = rect.bottom;
+
+    // Vérifier si l'onglet dépasse le bord inférieur de l'écran
+    if (topPosition + analysisTabHeight > windowHeight) {
+        // Ajuster la position verticale pour que l'onglet reste entièrement visible à l'écran
+        topPosition = windowHeight - analysisTabHeight;
+    }
+
+    // Définir les nouvelles positions de l'onglet d'analyse
+    analysisTab.style.left = `${leftPosition}px`;
+    analysisTab.style.top = `${topPosition}px`;
+}
+
+
+
+ function showAnalysis(sensorType, iconElement) {
+    // Vérifier si l'onglet d'analyse existe déjà
+    var analysisTab = document.querySelector('.analysis-tab');
+    if (!analysisTab) {
+        // Créer l'onglet d'analyse si ce n'est pas le cas
+        analysisTab = document.createElement('div');
+        analysisTab.className = 'analysis-tab';
+        document.body.appendChild(analysisTab);
+    }
+
+    // Objet pour stocker les résumés et les actions
+    var sensorInfo = {
+        temperature: {
+            summary: `La température actuelle est de ${temperatureValue}°C. `,
+            actions: `
+                <ul>
+                    <li>Vérifier l'isolation des serres si la température est trop élevée.</li>
+                    <li>Ajuster la ventilation si la température est trop basse.</li>
+                </ul>
+            `
+        },
+        lightIntensity: {
+            summary: `L'intensité lumineuse actuelle est de ${lightIntensityValue} lux. `,
+            actions: `
+                <ul>
+                    <li>Augmenter l'éclairage si l'intensité lumineuse est trop faible.</li>
+                    <li>Réduire l'éclairage si l'intensité lumineuse est trop élevée.</li>
+                </ul>
+            `
+        },
+        soilMoisture: {
+            summary: `L'humidité du sol actuelle est de ${soilMoistureValue} %. `,
+            actions: `
+                <ul>
+                    <li>Arroser si l'humidité du sol est trop faible.</li>
+                    <li>Réduire l'irrigation si l'humidité du sol est trop élevée.</li>
+                </ul>
+            `
+        },
+        gasConcentration: {
+            summary: `La concentration de gaz actuelle est de ${gasConcentrationValue} ppm. `,
+            actions: `
+                <ul>
+                    <li>Vérifier la ventilation si la concentration de gaz est trop élevée.</li>
+                    <li>Ajuster les sources de gaz si nécessaire.</li>
+                </ul>
+            `
+        }
+    };
+
+    // Récupérer le résumé et les actions pour le type de capteur spécifié
+    var summary = sensorInfo[sensorType].summary;
+    var actions = sensorInfo[sensorType].actions;
+
+    analysisTab.innerHTML = `
+        <a href="#" onclick="hideAnalysis()">Fermer</a>
+        <p>${summary}</p>
+        ${actions}
+    `;
+
+// Positionner l'onglet d'analyse
+var rect = iconElement.getBoundingClientRect();
+analysisTab.style.left = `${rect.left}px`;
+analysisTab.style.top = `${rect.bottom}px`;
+
+// Ajuster la position de l'onglet d'analyse si nécessaire
+adjustAnalysisTabPosition(analysisTab, rect);
+
+// Afficher l'onglet d'analyse
+analysisTab.style.display = 'block';
+
+
+    analysisTab.classList.add('show');
+}
+function hideAnalysis() {
+    var analysisTab = document.querySelector('.analysis-tab');
+    if (analysisTab) {
+        // Supprimer la classe pour cacher l'onglet
+        analysisTab.classList.remove('show');
+    }
+}
+ </script>
+</body>
+
+</html>

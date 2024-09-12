@@ -1,0 +1,396 @@
+/* Réduit la taille de la police de base pour une meilleure lisibilité */
+body {
+    font-size: 16px;
+    color: #333333; /* Couleur du texte */
+    background-color: #f8f9fa; /* Couleur de fond */
+}
+
+/* Styles personnalisés pour le logo et le texte du logo */
+/* Styles personnalisés pour le logo et le texte du logo */
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.logo-svg {
+    width: 50px; /* Ajustez la taille selon vos besoins */
+    height: auto;
+}
+
+.logo-text {
+    font-size: 1.5rem; /* Ajustez la taille de la police selon vos besoins */
+    font-weight: bold;
+    color: #4CAF50; /* Ajustez la couleur selon vos besoins */
+}
+
+/* Styles personnalisés pour le titre principal */
+.display-4 {
+    font-size: 2.5rem; /* Ajustez la taille de la police selon vos besoins */
+    font-weight: bold;
+    color: #333; /* Ajustez la couleur selon vos besoins */
+}
+
+/* Styles personnalisés pour le texte d'introduction */
+.lead {
+    font-size: 1.25rem; /* Ajustez la taille de la police selon vos besoins */
+    color: #666; /* Ajustez la couleur selon vos besoins */
+}
+
+
+.logo-text {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #4CAF50; /* Couleur du logo */
+    margin-left: 10px;
+}
+/* Styles personnalisés pour le bouton de connexion */
+.btn-primary {
+    background-color: #4CAF50; /* Ajustez la couleur de fond selon vos besoins */
+    border-color: #4CAF50; /* Ajustez la couleur de la bordure selon vos besoins */
+    color: #fff; /* Ajustez la couleur du texte selon vos besoins */
+    font-size: 1.25rem; /* Ajustez la taille de la police selon vos besoins */
+    padding: 10px 20px; /* Ajustez l'espacement selon vos besoins */
+    border-radius: 5px; /* Ajustez le rayon de la bordure selon vos besoins */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Ajoutez une transition pour un effet de survol */
+}
+
+.btn-primary:hover {
+    background-color: #3C9A44; /* Ajustez la couleur de fond sur survol selon vos besoins */
+    color: #fff; /* Ajustez la couleur du texte sur survol selon vos besoins */
+}
+
+.btn-lg {
+    padding: 15px 30px; /* Ajustez l'espacement pour les boutons de grande taille */
+    font-size: 1.5rem; /* Ajustez la taille de la police pour les boutons de grande taille */
+}
+
+/* Styles personnalisés pour les cartes de fonctionnalités */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.text-center {
+    text-align: center;
+}
+.card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease-in-out;
+    height: 100%; /* Hauteur uniforme pour toutes les cartes */
+    overflow: hidden;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+.card-title {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 15px;
+    height: 60px; /* Hauteur maximale pour le titre */
+    overflow: hidden;
+}
+.card-text {
+    color: #666;
+    overflow: hidden;
+}
+.card:hover .card-text {
+    max-height: none; /* Affiche le texte complet au survol */
+}
+.card-title::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 3px;
+    background-color: #007bff;
+    margin-top: 10px;
+}
+
+
+/* Styles personnalisés pour le pied de page */
+/* Styles de base pour le pied de page */
+/* Styles de base pour le pied de page */
+
+footer {
+    position: relative;
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 20px 0; /* Ajout d'un espacement supplémentaire en haut et en bas */
+  }
+  
+  footer a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s; /* Ajout d'une transition pour les liens */
+  }
+  
+  footer a:hover {
+    color: #f8f9fa; /* Changement de couleur au survol */
+  }
+  footer .footer-logo {
+    width: 50px; /* Largeur souhaitée pour le logo */
+    height: auto; /* Pour conserver le ratio de l'image */
+    vertical-align: middle; /* Aligner verticalement par rapport au texte */
+    margin-right: 10px; /* Ajouter un espacement à droite du logo */
+  }
+
+/* Ajustements pour les petits écrans */
+@media (max-width: 576px) {
+    footer {
+        padding: 15px 0; /* Réduit le padding sur les petits écrans */
+    }
+    footer p {
+        font-size: 1rem; /* Réduit la taille de police sur les petits écrans */
+    }
+}
+
+/* Ajustements pour les écrans moyens */
+@media (min-width: 577px) and (max-width: 768px) {
+    footer {
+        padding: 17px 0; /* Ajuste le padding pour les écrans moyens */
+    }
+    footer p {
+        font-size: 1.1rem; /* Ajuste la taille de police pour les écrans moyens */
+    }
+}
+
+/* Ajustements pour les grands écrans */
+@media (min-width: 769px) {
+    footer {
+        padding: 20px 0; /* Augmente le padding pour les grands écrans */
+    }
+    footer p {
+        font-size: 1.2rem; /* Augmente la taille de police pour les grands écrans */
+    }
+}
+
+
+
+/* Styles personnalisés pour le bouton de connexion */
+.nav-container .btn {
+    margin-top: 20px;
+}
+
+/* Styles personnalisés pour les titres de section */
+.introduction h2,
+.features h2,
+.gallery h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Styles personnalisés pour le texte d'introduction */
+.introduction p {
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Styles personnalisés pour le carrousel d'images */
+.carousel-section {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    padding-bottom: 30px;
+}
+
+.carousel-item img {
+    height: 400px; /* Ajustez la hauteur selon vos besoins */
+    object-fit: cover; /* Pour maintenir le ratio d'aspect des images */
+}
+
+/* Améliorations pour la responsivité */
+@media (max-width: 576px) {
+    .carousel-item img {
+        height: 200px; /* Réduit la hauteur sur les petits écrans */
+    }
+}
+.faq-section {
+    background-color: #f8f9fa;
+    padding: 20px 0;
+}
+
+.faq-section h2 {
+    margin-bottom: 30px;
+}
+
+.accordion .card {
+    border: none;
+    box-shadow: none;
+}
+
+.accordion .card-header {
+    border: none;
+    background-color: transparent;
+}
+
+.accordion .card-header button {
+    text-align: left;
+    width: 100%;
+    padding: 15px;
+    text-decoration: none;
+    color: #333;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    background-color: transparent;
+}
+
+.accordion .card-header button:hover {
+    color: #4CAF50;
+}
+
+.accordion .card-body {
+    border-top: 1px solid #ddd;
+    padding: 15px;
+}
+.why-use-section {
+    background-color: #f8f9fa;
+    padding: 20px 0;
+}
+
+.why-use-section h2 {
+    margin-bottom: 30px;
+}
+
+.why-use-section .card {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.why-use-section .card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.why-use-section .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.why-use-section .card-text {
+    font-size: 1.1rem;
+}
+/* Styles pour la galerie d'images */
+.gallery img {
+    height: 300px; /* Hauteur fixe pour toutes les images */
+    object-fit: cover; /* Assure que l'image couvre toute la zone sans déformation */
+    border-radius: 5px; /* Ajoute des coins arrondis pour une meilleure esthétique */
+    width: 100%; /* Largeur maximale pour s'adapter à la largeur du conteneur */
+    margin-bottom: 10px;
+}
+
+/* Ajustements pour les petits écrans */
+@media (max-width: 576px) {
+    .gallery img {
+        width: 100%; /* Largeur maximale sur les petits écrans */
+    }
+}
+
+/* Ajustements pour les écrans moyens */
+@media (min-width: 577px) and (max-width: 768px) {
+    .gallery img {
+        width: 100%; /* Largeur maximale sur les écrans moyens */
+    }
+}
+
+/* Ajustements pour les grands écrans */
+@media (min-width: 769px) {
+    .gallery img {
+        width: 100%; /* Largeur maximale sur les grands écrans */
+    }
+}
+.header-nav-section {
+    background-image: url('/Image/smart-farming-big-data-iot-1.jpeg');
+    background-size: cover;
+    background-position: center;
+    padding: 50px;
+    color: #fff;
+    margin-bottom: 10px; /* Réduction de la marge inférieure pour la section header-nav-section */
+}
+
+.green-line {
+    border: none; /* Supprimer la bordure par défaut */
+    border-top: 2px solid #48b348; /* Ajouter une bordure verte en haut */
+    width: 100%; /* Largeur de la ligne à 100% */
+    transition: width 0.5s ease; /* Transition pour la largeur */
+}
+
+.carousel-section {
+    margin-bottom: 20px; /* Conserver la marge inférieure pour la section carousel-section */
+}
+.faq-section {
+    background-color: #f8f9fa;
+    padding: 50px 0;
+}
+
+.faq-section h2 {
+    color: #212321;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.accordion .card-header {
+    background-color: #4CAF50;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.accordion .card-header h5 button {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    display: flex; /* Permet d'aligner l'icône et le texte */
+    align-items: center; /* Centre verticalement l'icône et le texte */
+}
+
+.accordion .card-header h5 button i {
+    margin-right: 10px; /* Ajoute un espace entre l'icône et le texte */
+}
+
+.accordion .card-body {
+    border: 1px solid #4CAF50;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    padding: 20px;
+}
+
+.accordion .card-header:hover {
+    background-color: #3f8a3a;
+}
+
+/* Ajout d'un indicateur de statut pour les questions-réponses */
+.accordion .card-header[aria-expanded="true"] i {
+    transform: rotate(180deg); /* Fait tourner l'icône pour indiquer l'état ouvert */
+}
+
+/* Media Queries pour une meilleure responsivité */
+@media (max-width: 768px) {
+    .faq-section {
+        padding: 30px 0;
+    }
+
+    .faq-section h2 {
+        font-size: 1.5rem;
+    }
+
+    .accordion .card-header {
+        border-radius: 5px;
+    }
+
+    .accordion .card-body {
+        padding: 15px;
+    }
+}
+
+
+

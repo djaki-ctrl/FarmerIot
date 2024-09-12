@@ -1,0 +1,275 @@
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc, serverTimestamp, getDocs, deleteDoc, doc, updateDoc, getDoc } from "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAFBon2ZjU1patYlYoitycfYYED71XduPo",
+  authDomain: "fir-691e8.firebaseapp.com",
+  projectId: "fir-691e8",
+  storageBucket: "fir-691e8.appspot.com",
+  messagingSenderId: "944321471274",
+  appId: "1:944321471274:web:b9126bd1020bd203b57453"
+};
+
+// Initialisation de l'application Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+//const Authentication = firebase.auth();
+// Obtenez une référence à la base de données Firestore
+const db = getFirestore(app);
+
+// Sélectionnez la référence à la collection "utilisateurs"
+const userRef = collection(db, "utilisateurs");
+
+// Sélectionnez le formulaire d'ajout d'utilisateur
+// Sélectionnez le formulaire d'ajout d'utilisateur
+const addUserForm = document.querySelector(".Ajouter");
+if (addUserForm) {
+ // Ajoutez un écouteur d'événements pour le formulaire
+ addUserForm.addEventListener("submit", async (e) => {
+    e.preventDefault(); // Empêche le formulaire de faire une requête HTTP
+
+    try {
+      // Créer un compte utilisateur dans Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, addUserForm.email.value, addUserForm.password.value);
+      const user = userCredential.user;
+
+      // Ajoutez un document utilisateur à Firestore avec les données du formulaire
+      await addDoc(userRef, {
+        uid: user.uid, // Ajoutez l'UID de l'utilisateur Firebase Authentication
+        nom: addUserForm.nom.value,
+        prenom: addUserForm.prenom.value,
+        email: addUserForm.email.value,
+        password: addUserForm.password.value, // Notez que stocker des mots de passe en clair n'est pas recommandé
+        role: addUserForm.role.value,
+        dateDajout: serverTimestamp(), // Utilisez serverTimestamp pour la date d'ajout
+      });
+      
+      // Réinitialiser le formulaire après l'ajout de l'utilisateur
+      addUserForm.reset();
+      
+      console.log("Utilisateur ajouté avec succès !");
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de l'utilisateur :", error);
+    }
+ });
+} else {
+ console.error("Le formulaire d'ajout d'utilisateur n'a pas été trouvé.");
+}
+
+
+// Fonction pour afficher la liste des utilisateurs dans le tableau
+// Function to display users
+async function afficherListeUtilisateurs() {
+  const userList = document.querySelector("#userList tbody");
+  userList.innerHTML = ""; // Clear previous content
+ 
+  try {
+     const snapshot = await getDocs(collection(db, "utilisateurs"));
+     snapshot.forEach((doc) => {
+       const user = doc.data();
+       const userRow = `
+         <tr class="user" data-user-id="${doc.id}">
+           <td class="username">${user.nom} ${user.prenom}</td>
+           <td class="email">${user.email}</td>
+           <td class="role">${user.role}</td>
+           <td class="userActions">
+             <button class="editBtn btn btn-info btn-action" data-toggle="modal" data-target="#editUserModal">Modifier</button>
+             <button class="deleteBtn btn btn-danger btn-action" data-user-id="${doc.id}">Supprimer</button>
+           </td>
+         </tr>`;
+       userList.innerHTML += userRow;
+     });
+  } catch (error) {
+     console.error("Erreur lors de la récupération des utilisateurs :", error);
+  }
+ }
+ 
+ // Attach event listeners to delete buttons
+ function attachDeleteButtonListeners() {
+  document.querySelector("#userList").addEventListener('click', function(event) {
+     if (event.target.classList.contains('deleteBtn')) {
+       const userId = event.target.getAttribute('data-user-id');
+       supprimerUser(userId).catch(error => console.error("Erreur lors de l'appel de supprimerUser :", error));
+     }
+  });
+ }
+ 
+ // Function to delete a user
+ async function supprimerUser(userId) {
+  const confirmation = confirm("Voulez-vous vraiment supprimer cet utilisateur ?");
+  if (confirmation) {
+     try {
+       await deleteDoc(doc(db, "utilisateurs", userId));
+       console.log("Utilisateur supprimé avec succès !");
+       afficherListeUtilisateurs(); // Update the list after deletion
+     } catch (error) {
+       console.error("Erreur lors de la suppression de l'utilisateur :", error);
+     }
+  }
+ }
+ 
+ // Attach event listeners to edit buttons
+ document.querySelectorAll('.editBtn').forEach(button => {
+  button.addEventListener('click', function() {
+     const userId = this.closest('.user').getAttribute('data-user-id');
+     const userDoc = doc(db, "utilisateurs", userId);
+ 
+     getDoc(userDoc).then((docSnapshot) => {
+       if (docSnapshot.exists()) {
+         const userData = docSnapshot.data();
+ 
+         // Populate the modal form with user data
+         document.querySelector('#editUsername').value = userData.nom;
+         document.querySelector('#editEmail').value = userData.email;
+         document.querySelector('#editRole').value = userData.role;
+         // Add a hidden input field to store the user ID
+         document.querySelector('#editUserForm').insertAdjacentHTML('beforeend', `<input type="hidden" id="userId" name="userId" value="${userId}">`);
+ 
+         // Show the modal
+         $('#editUserModal').modal('show');
+       } else {
+         console.log("No such document!");
+       }
+     }).catch((error) => {
+       console.log("Error getting document:", error);
+     });
+  });
+ });
+ 
+ // Function to handle the form submission for updating the user's data
+ document.querySelector('#editUserForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+ 
+  const userId = document.querySelector('#userId').value;
+  const userDoc = doc(db, "utilisateurs", userId);
+ 
+  try {
+     await updateDoc(userDoc, {
+       nom: document.querySelector('#editUsername').value,
+       email: document.querySelector('#editEmail').value,
+       role: document.querySelector('#editRole').value,
+     });
+ 
+     console.log("Utilisateur modifié avec succès !");
+     // Optionally, refresh the user list to reflect the changes
+     afficherListeUtilisateurs();
+  } catch (error) {
+     console.error("Erreur lors de la modification de l'utilisateur :", error);
+  }
+ });
+ 
+ // Call the function to display users
+ afficherListeUtilisateurs().then(() => {
+  attachDeleteButtonListeners(); // Attach event listeners after the list is updated
+ });
+
+// Initialize Firebase (assuming you have already done this elsewhere in your application)
+// firebase.initializeApp(firebaseConfig);
+
+// Get a reference to the auth service
+
+function signInUser(email, password) {
+ auth.signInWithEmailAndPassword(email, password)
+    .then(async (userCredential) => {
+      const user = userCredential.user;
+      console.log("User signed in:", user);
+
+      const userDoc = await db.collection('utilisateurs').doc(user.uid).get();
+      const userRole = userDoc.data().role;
+
+      if (userRole === 'user') {
+        window.location.href = 'index.html';
+      } else if (userRole === 'admin') {
+        window.location.href = 'dashboard.html';
+      } else {
+        console.error("Role non reconnu:", userRole);
+      }
+    })
+    .catch((error) => {
+      console.error("Error signing in:", error.code, error.message);
+      document.getElementById('errorMessage').textContent = 'Email ou mot de passe incorrect';
+    });
+}
+
+// Function to parse query parameters from the URL
+function getQueryParams() {
+ const urlParams = new URLSearchParams(window.location.search);
+ const email = urlParams.get('email');
+ const password = urlParams.get('password');
+ return { email, password };
+}
+
+// Check if the URL contains email and password parameters
+const { email, password } = getQueryParams();
+if (email && password) {
+ signInUser(email, password);
+}
+
+window.signInUser = signInUser;
+
+document.addEventListener('DOMContentLoaded', function() {
+ document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    signInUser(email, password);
+ });
+});
+
+auth.onAuthStateChanged((user) => {
+ if (user) {
+    const userDoc = db.collection('utilisateurs').doc(user.uid);
+    userDoc.get().then((doc) => {
+      if (doc.exists) {
+        const userRole = doc.data().role;
+        if (userRole === 'user') {
+          window.location.href = 'index.html';
+        } else if (userRole === 'admin') {
+          window.location.href = 'dashboard.html';
+        } else {
+          console.error("Role non reconnu:", userRole);
+        }
+      } else {
+        console.error("No such document!");
+      }
+    }).catch((error) => {
+      console.error("Error getting document:", error);
+    });
+ } else {
+    console.log("User is signed out.");
+ }
+});
+
+function signOutUser() {
+ signOut(auth)
+    .then(() => {
+      console.log('User signed out!');
+      // Optionally, redirect the user to the login page or another appropriate page
+      window.location.href = 'connexion.html'; // Adjust the URL as needed
+    })
+    .catch((error) => {
+      console.error('Error signing out:', error);
+    });
+}
+const logoutBtn = document.querySelector('#logoutbtn');
+logoutBtn.addEventListener('click', e => {
+ e.preventDefault();
+ signOutUser();
+});
+
+
+ 
+ // Fonction pour basculer la visibilité du mot de passe
+ function togglePasswordVisibility() {
+  const passwordInput = document.getElementById('password');
+  const toggleButton = document.querySelector('.toggle-password');
+ 
+  const type = passwordInput.type === 'password' ? 'text' : 'password';
+  passwordInput.type = type;
+ 
+  toggleButton.classList.toggle('fa-eye-slash');
+  toggleButton.classList.toggle('fa-eye');
+ }
+ 

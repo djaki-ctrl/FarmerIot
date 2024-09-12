@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+ <div class="container">
+    <a href="connexion.html" class="btn btn-primary" style="text-align: center;">
+        <h2>Inscription</h2> 
+    </a>
+    <div id="successMessage" style="display: none;">
+        Votre compte a été créé avec succès. Veuillez contacter le service technique.
+    </div>
+    <form class="Ajouter" id="addUserForm" action="/path/to/your/server/script" method="post">
+        <!-- Étape 1 -->
+        <fieldset id="step1">
+            <legend>Étape 1</legend>
+            <div class="form-group">
+                <label for="nom">Nom :</label>
+                <input type="text" class="form-control" id="nom" name="nom" required aria-required="true">
+            </div>
+            <div class="form-group">
+                <label for="prenom">Prénom :</label>
+                <input type="text" class="form-control" id="prenom" name="prenom" required aria-required="true">
+            </div>
+            <button type="button" class="next" aria-label="Suivant">Suivant</button>
+        </fieldset>
+        
+        <!-- Étape 2 -->
+        <fieldset id="step2" style="display:none;">
+            <legend>Étape 2</legend>
+            <div class="form-group">
+                <label for="email">E-mail :</label>
+                <input type="email" class="form-control" id="email" name="email" required aria-required="true">
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe :</label>
+                <input type="password" class="form-control" id="password" name="password" required aria-required="true">
+            </div>
+            <button type="button" class="prev" aria-label="Précédent">Précédent</button>
+            <button type="button" class="next" aria-label="Suivant">Suivant</button>
+        </fieldset>
+
+        <!-- Étape 3 -->
+        <fieldset id="step3" style="display:none;">
+            <legend>Étape 3</legend>
+            <div class="form-group">
+                <label for="telephone">Téléphone :</label>
+                <input type="tel" class="form-control" id="telephone" name="telephone">
+            </div>
+            <div class="form-group">
+                <label for="adresse">Adresse :</label>
+                <input type="text" class="form-control" id="adresse" name="adresse">
+            </div>
+            <div class="form-group">
+                <label for="ville">Ville :</label>
+                <input type="text" class="form-control" id="ville" name="ville">
+            </div>
+            <button type="button" class="prev" aria-label="Précédent">Précédent</button>
+            <button type="submit" aria-label="S'inscrire">S'inscrire</button>
+        </fieldset>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("addUserForm");
+    const fieldsets = form.querySelectorAll("fieldset");
+    const nextButtons = form.querySelectorAll(".next");
+    const prevButtons = form.querySelectorAll(".prev");
+
+    let currentStep = 0;
+    showStep(currentStep);
+
+    nextButtons.forEach((button, index) => {
+        button.addEventListener("click", function() {
+            if (validateStep(currentStep)) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        });
+    });
+
+    prevButtons.forEach((button, index) => {
+        button.addEventListener("click", function() {
+            currentStep--;
+            showStep(currentStep);
+        });
+    });
+
+    function showStep(stepIndex) {
+        fieldsets.forEach((fieldset, index) => {
+            if (index === stepIndex) {
+                fieldset.style.display = "block";
+            } else {
+                fieldset.style.display = "none";
+            }
+        });
+    }
+
+    function validateStep(stepIndex) {
+        // Ajoutez ici la logique de validation pour chaque étape si nécessaire
+        return true; // Retourne true si la validation réussit
+    }
+});
+</script>
+<script src="./bundle.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page de Connexion</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Lien vers votre fichier CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Connexion</h2>
+        <form  class="login" id="login-Form">
+            <label for="email">Email :</label>
+            <input type="email" id="email" name="email" autocomplete="off" placeholder="Entrez votre email" required>
+            <div id="passwordField" class="password-container">
+                <label for="password">Mot de passe :</label>
+                <input type="password" id="password" name="password" placeholder="Entrez votre mot de passe" autocomplete="new-password" required>
+                <span class="icon-container">
+                    <i class="fa fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
+                </span>
+            </div>
+            
+            <button type="submit">Se Connecter</button>
+            <button type="button" class="logout-Btn">Se deconnecter</button>
+            <p id="errorMessage" class="error-message"><p>
+        </form>
+        <div class="additional-options">
+            <a href="mot-de-passe-oublie.html">Mot de passe oublié ?</a> <!-- Lien vers la page de récupération de mot de passe -->
+        </div>
+    </div>
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+
+<!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-analytics.js"></script>
+
+<!-- Add Firebase products that you want to use -->
+<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+<script>
+    const firebaseConfig = {
+     apiKey: "AIzaSyAFBon2ZjU1patYlYoitycfYYED71XduPo",
+     authDomain: "fir-691e8.firebaseapp.com",
+     projectId: "fir-691e8",
+     storageBucket: "fir-691e8.appspot.com",
+     messagingSenderId: "944321471274",
+     appId: "1:944321471274:web:b9126bd1020bd203b57453"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    
+    // Initialize Firebase Authentication
+    const auth = firebase.auth();
+    
+    const loginForm = document.querySelector(".login");
+    loginForm.addEventListener('submit', (e) => {
+     e.preventDefault();
+    
+     const email = loginForm.email.value;
+     const password = loginForm.password.value;
+    
+     auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          console.log("User is logged in:", userCredential.user);
+          // Redirect the user to a different page after successful login
+          window.location.href = 'dashboardAdmin.html'; // Example redirect
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log("Login error:", errorMessage);
+          // Display the error message to the user
+          document.getElementById('errorMessage').textContent = errorMessage;
+          // Handle specific errors
+          if (errorCode === 'auth/wrong-password') {
+            console.log('Incorrect password.');
+          } else {
+            console.log(errorMessage);
+          }
+        });
+    });
+    </script>
+    
+    <script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const toggleButton = document.querySelector('.toggle-password');
+    
+        // Change the input type of the password between "password" and "text"
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+    
+        // Change the icon/button based on the current input type
+        toggleButton.classList.toggle('fa-eye-slash'); // Add the class for the crossed eye icon
+        toggleButton.classList.toggle('fa-eye'); // Remove the class for the eye icon
+    }
+    </script>
+    
+</body>
+</html>

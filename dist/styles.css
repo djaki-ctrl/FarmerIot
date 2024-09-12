@@ -1,0 +1,310 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #d3e1c4; /* Vert clair pour évoquer la nature */
+    background-image: url('/Image/smart-farming-big-data-iot-1.jpeg');
+    background-size: cover;
+    background-position: center;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* Style pour le formulaire divisé en étapes */
+/* Définition des variables CSS pour une meilleure gestion des couleurs et tailles */
+:root {
+    --primary-color: #4CAF50;
+    --secondary-color: #ccc;
+    --text-color: #333;
+    --font-size-large: 24px;
+    --font-size-medium: 18px;
+    --font-size-small: 14px;
+    --transition-duration: 0.3s;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+form {
+    text-align: left;
+}
+
+fieldset {
+    display: none;
+}
+
+fieldset:first-of-type {
+    display: block;
+}
+
+legend {
+    font-size: var(--font-size-large);
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    transition: border-color var(--transition-duration);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="password"]:focus {
+    border-color: var(--primary-color);
+}
+
+button {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color var(--transition-duration);
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+button.prev {
+    background-color: var(--secondary-color);
+}
+
+button.prev:hover {
+    background-color: #999;
+}
+
+.step-indicator {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.step {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--secondary-color);
+    border-radius: 50%;
+    margin: 0 10px;
+    background-color: #fff;
+    font-size: var(--font-size-small);
+    line-height: 20px;
+    color: var(--secondary-color);
+}
+
+.step.active {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.step.completed {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.step.active::after {
+    content: '\2713';
+}
+
+.step.completed::after {
+    content: '\2713';
+}
+
+.step:not(:first-child)::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 2px;
+    background-color: var(--secondary-color);
+    position: absolute;
+    top: 8px;
+    left: -20px;
+}
+
+.step.active:not(:first-child)::before {
+    background-color: var(--primary-color);
+}
+
+
+
+h2 {
+    color: #4CAF50;
+    margin-bottom: 30px;
+    font-family: 'Georgia', serif; /* Police de caractères rustique */
+    font-size: 24px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    color: #4CAF50;
+}
+
+/* Styles pour l'input */
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    transition: border-color 0.3s;
+    font-size: 16px;
+    position: relative; /* Permet de positionner les éléments pseudo-éléments */
+}
+
+/* Effet de bordure lumineuse */
+input:focus {
+    border-color: transparent; /* Masque la bordure normale */
+}
+
+input:focus::before, input:focus::after {
+    content: ''; /* Ajoute un contenu vide */
+    position: absolute; /* Position absolue par rapport à l'élément parent */
+    top: -2px; /* Ajustement de la position pour correspondre à la bordure */
+    left: -2px; /* Ajustement de la position pour correspondre à la bordure */
+    right: -2px; /* Ajustement de la position pour correspondre à la bordure */
+    bottom: -2px; /* Ajustement de la position pour correspondre à la bordure */
+    border-radius: 20px; /* Correspond au rayon de la bordure de l'input */
+    background-color: rgba(76, 175, 80, 0.4); /* Couleur de la bordure lumineuse */
+    pointer-events: none; /* Permet de cliquer à travers l'élément pseudo-élément */
+    z-index: -1; /* Place l'élément en dessous de l'input */
+}
+
+input:focus::after {
+    animation: borderPulse 1s infinite alternate; /* Animation de l'effet lumineux */
+}
+
+/* Animation pour l'effet lumineux */
+@keyframes borderPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); /* Taille initiale de la bordure lumineuse */
+    }
+    100% {
+        box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); /* Taille maximale de la bordure lumineuse */
+    }
+}
+
+
+button {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.error-message {
+    color: #FF0000;
+    margin-top: 10px;
+}
+
+/* Animation de respiration */
+@keyframes breathe {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s; /* Ajouter une transition pour le changement de couleur */
+}
+
+a:hover {
+    color: #45a049;
+    animation: breathe 3s infinite; /* Appliquer l'animation de respiration */
+}
+
+a:hover, a:focus {
+    animation-play-state: paused; /* Mettre en pause l'animation au survol ou au focus */
+}
+
+/* Styles pour la classe password-container */
+.password-container {
+    position: relative;
+}
+
+/* Styles pour l'icône de bascule */
+/* Styles pour l'icône de bascule */
+.icon-container {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #4CAF50; /* Couleur verte par défaut */
+    transition: color 0.3s; /* Transition pour le changement de couleur */
+}
+
+/* Changement de couleur au survol */
+.icon-container:hover {
+    color: #45a049;
+}
+
+/* Améliorer la visibilité des liens */
+.additional-options a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s; /* Transition pour le changement de couleur */
+    margin: 0 10px; /* Espacement entre les liens */
+}
+
+.additional-options a:hover {
+    color: #45a049;
+}
+
+/* Personnaliser les messages d'erreur */
+.error-message {
+    color: #FF0000;
+    margin-top: 10px;
+    font-size: 14px; /* Taille de police légèrement réduite */
+}
+
+/* Optimiser l'affichage sur les appareils mobiles */
+@media screen and (max-width: 768px) {
+    .container {
+        max-width: 90%; /* Réduire la largeur maximale sur les appareils plus petits */
+    }
+    input, button, .additional-options a {
+        width: 100%; /* Assurer une largeur maximale sur les appareils plus petits */
+    }
+}
+

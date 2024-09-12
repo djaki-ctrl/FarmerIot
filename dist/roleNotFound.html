@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css"> <!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+/* Couleurs et Contrastes */
+:root {
+  --primary-color: #4CAF50;
+  --secondary-color: #379422;
+  --text-color: #333;
+  --background-color: #f8f9fa;
+  --hover-color: #45a049;
+}
+
+body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa; /* Couleur de fond plus douce */
+      color: #333;
+    }
+
+/* Style amélioré pour la navbar */
+.navbar {
+  background-color: #4CAF50; /* Couleur de fond principale */
+  overflow: hidden;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.5s ease;
+}
+
+.navbar a {
+  color: #fff; /* Couleur du texte */
+  text-decoration: none;
+  padding: 10px 20px; /* Espacement des liens */
+  display: inline-block;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px; /* Taille de la police */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar a:hover {
+  background-color: #4CAF50; /* Couleur de fond au survol */
+  color: #000; /* Couleur du texte au survol */
+}
+
+/* Style spécifique pour le dropdown de la navbar */
+.navbar .dropdown-menu {
+  background-color: #4CAF50; /* Couleur de fond du sous-menu */
+  border-radius: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .dropdown-menu a {
+  color: #fff;
+  padding: 10px 20px;
+  display: block;
+  text-align: left;
+}
+
+.navbar .dropdown-menu a:hover {
+  background-color: #4CAF50;
+}
+
+/* Réactivité */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  .navbar {
+    padding: 10px; /* Réduit le padding sur les petits écrans */
+  }
+
+  .navbar a {
+    padding: 10px 15px; /* Ajuste l'espacement des liens */
+    font-size: 14px; /* Réduit la taille de la police pour les petits écrans */
+  }
+
+  .navbar .dropdown-menu a {
+    padding: 10px 15px;
+  }
+}
+
+
+
+
+footer {
+  position: relative;
+  background-color: #4CAF50;
+  color: white;
+  text-align: center;
+  padding: 20px 0; /* Ajout d'un espacement supplémentaire en haut et en bas */
+}
+
+footer a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s; /* Ajout d'une transition pour les liens */
+}
+
+footer a:hover {
+  color: #f8f9fa; /* Changement de couleur au survol */
+}
+footer .footer-logo {
+  width: 50px; /* Largeur souhaitée pour le logo */
+  height: auto; /* Pour conserver le ratio de l'image */
+  vertical-align: middle; /* Aligner verticalement par rapport au texte */
+  margin-right: 10px; /* Ajouter un espacement à droite du logo */
+}
+
+
+/* Styles pour le bouton de déconnexion */
+.logout-btn {
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  background-color: #379422;
+  border: none;
+  border-radius: 50px;
+  transition: background-color 0.3s;
+  position: relative;
+}
+
+.logout-btn::after {
+  content: "Déconnexion";
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px);
+  transform: translateY(-50%);
+  white-space: nowrap;
+  background-color: #379422;
+  color: white;
+  border-radius: 5px;
+  transition: opacity 0.3s, transform 0.3s;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.logout-btn:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(10px);
+}
+
+.logout-btn .bi {
+  margin-right: 5px;
+  font-size: 1.2em;
+  vertical-align: auto;
+  margin-left: 4px;
+}
+
+/* Welcome Message Styles */
+#welcomeMessage {
+  font-family: 'Arial', sans-serif;
+  font-size: 24px;
+  color: #444;
+  font-weight: 500;
+  text-align: center;
+  margin: 30px auto;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 1s ease-in;
+  transition: background-color 0.3s ease;
+}
+
+#welcomeMessage:hover {
+  background-color: #f0f0f0;
+  animation: pulse 1s infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Responsiveness */
+@media (max-width: 576px) {
+  .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* Styles personnalisés pour la table de paiement */
+.payment-table {
+  margin-top: 20px;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.payment-table th, .payment-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.payment-table th {
+  background-color: #f8f9fa;
+  color: #333;
+  font-weight: bold;
+  text-align: left;
+}
+
+.payment-table tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.payment-table tr:hover {
+  background-color: #f0f0f0;
+}
+
+/* Ajout d'un style pour les liens dans la table de paiement */
+.payment-table a {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.payment-table a:hover {
+  color: var(--secondary-color);
+}
+/* Variables CSS pour les couleurs */
+:root {
+ --primary-color: #4CAF50;
+ --secondary-color: #379422;
+ --text-color: #333;
+ --background-color: #f8f9fa;
+ --hover-color: #45a049;
+ --chat-bg-color: #fff;
+ --chat-border-color: #ccc;
+}
+
+/* Styles des questions */
+.question {
+ background-color: var(--background-color);
+ color: var(--text-color);
+ padding: 8px;
+ border-radius: 5px;
+ margin-bottom: 5px;
+}
+
+/* Styles pour le chargement */
+.loader {
+  border: 4px solid #f3f3f3; /* Gris clair */
+  border-top: 4px solid #3498db; /* Bleu */
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite; /* Animation de rotation */
+  margin-right: 10px;
+}
+
+/* Animation de rotation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Styles des réponses */
+.message.answer {
+  display: flex; /* Pour aligner le texte et l'icône */
+  align-items: center; /* Pour aligner verticalement */
+  background-color: #4CAF50; /* Couleur de fond pour les réponses */
+  color: white; /* Couleur du texte pour les réponses */
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+
+/* Style du bouton de chat en direct */
+.live-chat-btn {
+ position: fixed;
+ bottom: 20px;
+ right: 20px;
+ padding: 10px 20px;
+ background-color: var(--primary-color);
+ color: white;
+ border: none;
+ border-radius: 50px;
+ cursor: pointer;
+ z-index: 9999;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+ transition: background-color 0.3s ease;
+}
+
+.live-chat-btn:hover {
+ background-color: var(--secondary-color);
+}
+
+.live-chat-btn:focus {
+ outline: 2px solid var(--primary-color);
+}
+
+/* Styles de la fenêtre de chat */
+.chat-popup {
+ display: none;
+ position: fixed;
+ bottom: 90px;
+ right: 20px;
+ border: 1px solid var(--chat-border-color);
+ background-color: var(--chat-bg-color);
+ border-radius: 10px;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+ z-index: 9999;
+ width: 300px;
+}
+
+.chat-header {
+ background-color: var(--primary-color);
+ color: white;
+ padding: 10px;
+ border-radius: 10px 10px 0 0;
+}
+
+.chat-area {
+ height: 200px;
+ overflow-y: auto;
+ padding: 10px;
+}
+
+#chatInput {
+ width: calc(100% - 20px);
+ padding: 10px;
+ margin: 5px 0;
+ border: none;
+ border-radius: 5px;
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.send-btn, .close-btn {
+ padding: 10px 20px;
+ margin: 5px 0;
+ border: none;
+ cursor: pointer;
+ border-radius: 5px;
+ transition: background-color 0.3s ease;
+}
+
+.send-btn {
+ background-color: var(--primary-color);
+ color: white;
+}
+
+.send-btn:hover, .close-btn:hover {
+ background-color: var(--secondary-color);
+}
+
+/* Réactivité */
+@media screen and (max-width: 768px) {
+ .chat-popup {
+    width: 90%;
+    right: 5%;
+    bottom: 0;
+ }
+}
+
+
+</style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="roleNotFound.html"><i class="bi bi-house-door"></i> Accueil</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+  
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="statistiques.html" data-target="#inscriptionPopup"><i class="bi bi-bar-chart-line"></i> Statistiques</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target="#inscriptionPopup">
+              <i class="bi bi-speedometer2"></i> Capteurs
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#temperature"><i class="bi bi-thermometer"></i> Température</a></li>
+              <li><a class="dropdown-item" href="#lightIntensity"><i class="bi bi-brightness-high"></i> Intensité Lumineuse</a></li>
+              <li><a class="dropdown-item" href="#soilMoisture"><i class="bi bi-cloud-rain"></i> Humidité du Sol</a></li>
+              <li><a class="dropdown-item" href="#gasConcentration"><i class="bi bi-cloud"></i> Concentration de Gaz</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="info.html" data-target="#inscriptionPopup"><i class="bi bi-info-circle"></i> Infos</a>
+          </li>
+          <li id="userNavItem" class="nav-item">
+            <!-- Username of logged-in user will be inserted here -->
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-btn" href="#" id="logoutBtn">
+              <i class="bi bi-power"></i> <!-- Logout Icon -->
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Popup pour l'inscription -->
+  <div id="inscriptionPopup" class="modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Validation requise</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Veuillez finaliser votre inscription pour accéder à cette fonctionnalité.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+          <a href="inscription.html" class="btn btn-primary">Finaliser l'inscription</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<div id="welcomeMessage">Bienvenue sur Farmer+ !</div>
+<div class="container">
+    <h1 class="text-center my-4">Modalités de Paiement</h1>
+    <p class="text-center">Choisissez la méthode de paiement qui vous convient le mieux pour votre abonnement à Farmer+.</p>
+    <table class="table payment-table">
+        <thead>
+            <tr>
+                <th>Méthode de Paiement</th>
+                <th>Description</th>
+                <th>Frais</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Carte de Crédit</td>
+                <td>Paiement sécurisé en ligne avec carte de crédit.</td>
+                <td>2% de frais de transaction</td>
+            </tr>
+            <tr>
+                <td>PayPal</td>
+                <td>Paiement sécurisé via PayPal.</td>
+                <td>0% de frais de transaction</td>
+            </tr>
+            <tr>
+                <td>Chèque</td>
+                <td>Paiement par chèque envoyé à notre adresse.</td>
+                <td>Gratuit</td>
+            </tr>
+            <tr>
+                <td>Virement Bancaire</td>
+                <td>Paiement par virement bancaire directement sur notre compte.</td>
+                <td>Gratuit</td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="text-center">Nous offrons une variété de méthodes de paiement pour rendre l'abonnement à Farmer+ aussi pratique que possible. Si vous avez des questions concernant les paiements ou si vous souhaitez discuter d'autres options, n'hésitez pas à nous contacter. Notre équipe est là pour vous aider !</p>
+</div>
+
+
+<!-- Ajouter un bouton de chat en direct -->
+
+
+<div id="chatPopup" class="chat-popup">
+    <div class="chat-area" id="chatArea">
+      <!-- Message d'accueil initial -->
+      <div class="message">Bienvenue dans notre chat en direct. Comment puis-je vous aider ?</div>
+    </div>
+    <!-- Champ de saisie pour poser une question -->
+    <input type="text" id="chatInput" class="chat-input" placeholder="Posez votre question ici...">
+    <!-- Bouton d'envoi de la question -->
+    <button id="sendBtn" class="send-btn">Envoyer</button>
+    <!-- Bouton pour fermer la fenêtre de chat -->
+    <button id="closeBtn" class="close-btn">&times;</button>
+  </div>
+  <!-- Bouton pour ouvrir la fenêtre de chat en direct -->
+  <button class="live-chat-btn">Chat en Direct</button>
+  
+  
+  
+
+<footer class="mt-5">
+  <p>Site développé par <a href="#"><img src="/Image/logo.png" alt="Logo" class="footer-logo">Votre Nom</a> | Suivez-nous sur 
+    <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a> 
+    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a> 
+    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+  </p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS -->
+
+<script>
+
+    var logoutBtn = document.getElementById('logoutBtn');
+    
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', function () {
+        // Ajoutez votre logique de déconnexion ici, par exemple :
+        // Redirection vers la page de connexion
+        window.location.href = 'connexion.html';
+      });
+    }
+   </script>
+    
+   
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const userName = localStorage.getItem('userName');
+                if (userName) {
+                    const userNavItem = document.getElementById('userNavItem');
+                    userNavItem.innerHTML = `<a class="nav-link" href="#">${userName}</a>`;
+        
+                    const welcomeMessage = document.getElementById('welcomeMessage');
+                    welcomeMessage.textContent = `Bienvenue, ${userName} !`;
+                }
+            } catch (error) {
+                console.error('Erreur lors de la récupération du nom d\'utilisateur :', error);
+            }
+        });
+        </script>
+        
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const liveChatBtn = document.querySelector('.live-chat-btn');
+            const chatPopup = document.getElementById('chatPopup');
+            const chatArea = document.getElementById('chatArea');
+            const chatInput = document.getElementById('chatInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const closeBtn = document.getElementById('closeBtn');
+        
+            liveChatBtn.addEventListener('click', () => {
+                chatPopup.style.display = 'block';
+            });
+        
+            closeBtn.addEventListener('click', () => {
+                chatPopup.style.display = 'none';
+            });
+        
+            sendBtn.addEventListener('click', () => {
+                const question = chatInput.value.trim();
+                if (question !== '') {
+                    displayMessage('Vous : ' + question, 'question');
+                    displayMessage('Chatbot : ', 'loading');
+                    setTimeout(() => {
+                        const answer = getAnswer(question);
+                        displayMessage('Chatbot : ' + answer, 'answer');
+                    }, 1000);
+                    chatInput.value = '';
+                }
+            });
+        });
+        
+        function displayMessage(message, type) {
+            const newMessage = document.createElement('div');
+            newMessage.textContent = message;
+            newMessage.classList.add('message', type);
+            chatArea.appendChild(newMessage);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+        
+        function getAnswer(question) {
+            const lowerCaseQuestion = question.toLowerCase();
+            const greetings = ["cc", "coucou", "bonjour", "salut", "bonsoir"];
+            const farewells = ["au revoir"];
+            const thanks = ["merci", "Merci"];
+            const howAreYou = ["comment ca va?", " comment vas-tu?", "Comment allez-vous?", "How are you?","comment tu vas ?"];
+            const nextWeekend = ["quand est le prochain week-end?", "quand est le prochain week-end ?"];
+            const whatIsFarmerPlus = ["qu'est-ce que farmer+", "qu'est-ce que farmer+ ?"];
+            const howDoesFarmerPlusWork = ["comment fonctionne farmer+ ?", "comment fonctionne farmer+" , "comment cela fonction " , "comment ca fonction ?" , "comment ça fonctionne"];
+            const advantagesOfFarmerPlus = ["quels sont les avantages de farmer+ ?" , "pourquoi utiliser farmer+" , "quel sont les avantages"];
+            const howToGetFarmerPlus = ["comment puis-je obtenir farmer+ ?","comment puis-je obtenir farmer+", "comment avoir farmer+ " , "comment faire pour l'avoir " ];
+        
+            if (greetings.includes(lowerCaseQuestion)) {
+                return "Bonjour ! 🌞 Comment ça va ? Je suis là pour vous aider. Quelle est votre question aujourd'hui ?";
+            } else if (farewells.includes(lowerCaseQuestion)) {
+                return "Au revoir ! N'oubliez pas de me dire si vous avez besoin d'aide.";
+            } else if (thanks.includes(lowerCaseQuestion)) {
+                return "De rien, c'est mon plaisir";
+            } else if (howAreYou.includes(lowerCaseQuestion)) {
+                return "Je vais bien, et toi ? Comment allez-vous ?";
+            } else if (nextWeekend.includes(lowerCaseQuestion)) {
+                let date = new Date().getDate() + 6;
+                return "Le prochain week-end sera dans environ " + date + " jours.";
+            } else if (whatIsFarmerPlus.includes(lowerCaseQuestion)) {
+                return "Farmer+ est un système innovant qui utilise l'Internet des Objets (IoT) pour surveiller l'environnement agricole. Il aide les agriculteurs à optimiser leurs pratiques et à améliorer la productivité de leurs cultures.";
+            } else if (howDoesFarmerPlusWork.includes(lowerCaseQuestion)) {
+                return "Farmer+ fonctionne en déployant un réseau de capteurs intelligents dans vos champs. Ces capteurs collectent des données sur l'humidité, la température, la lumière, et d'autres facteurs environnementaux. Ensuite, notre système analyse ces données pour fournir des recommandations personnalisées, comme quand arroser vos plantes ou comment ajuster la température de vos serres.";
+            } else if (advantagesOfFarmerPlus.includes(lowerCaseQuestion)) {
+                return "Les avantages de Farmer+ sont nombreux ! 🌱 Vous pouvez économiser de l'eau, réduire les coûts de production, et augmenter la qualité de vos cultures. De plus, vous bénéficiez d'une meilleure gestion des ressources et d'une prise de décision basée sur des données précises.";
+            } else if (howToGetFarmerPlus.includes(lowerCaseQuestion)) {
+                return "Pour obtenir Farmer+, il suffit de nous contacter. Notre équipe commerciale est à votre disposition pour discuter de vos besoins et de la manière dont Farmer+ peut vous aider. Vous pouvez les joindre au numéro +225-07-87-44-96-54 ou via email à contact@farmerplus.com.";
+            } else {
+                return "Je suis désolé, je ne comprends pas. 😕 Pouvez-vous reformuler votre question ? Je suis là pour vous aider.";
+            }
+        }
+        </script>
+    
+    
+    <script>
+      // Détecte le clic sur les liens de la navbar
+document.addEventListener('DOMContentLoaded', function() {
+  var navbarLinks = document.querySelectorAll('.navbar-nav a');
+  navbarLinks.forEach(function(link) {
+    link.addEventListener('click', function(event) {
+      var target = this.getAttribute('data-target');
+      if (target && document.querySelector(target)) {
+        event.preventDefault(); // Empêche le lien de se comporter normalement
+        $('#inscriptionPopup').modal('show'); // Affiche le popup
+      }
+    });
+  });
+});
+
+    </script>
+    
+</body>
+</html>

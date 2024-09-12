@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+   <!-- Font Awesome CSS -->
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+ 
+  <style>
+/* Reset CSS */
+/* Reset CSS */
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: #28a745;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 24px;
+        }
+
+nav .navbar {
+  background-color: #28a745;
+  padding: 15px 20px;
+  border-bottom: 2px solid #28a745; /* Ajout d'une bordure en bas de la navbar */
+}
+
+.navbar-brand {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler-icon {
+  background-color: #28a745;
+}
+
+.navbar-nav {
+  margin-right: 20px;
+}
+
+.nav-link {
+  font-size: 16px;
+  margin-right: 15px;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #28a745;
+}
+
+.btn-outline-light {
+  font-size: 16px;
+  padding: 8px 15px;
+  border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-outline-light:hover {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.dropdown-menu {
+  background-color: #28a745;
+}
+
+.dropdown-item {
+  color: #fff !important;
+}
+
+.dropdown-item:hover {
+  background-color: #218838;
+}
+
+main {
+  padding: 40px 0;
+}
+
+section {
+  margin-bottom: 40px;
+}
+
+section h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #28a745;
+  border-bottom: 2px solid #28a745;
+  padding-bottom: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  text-align: left;
+  color: #333;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+  background-color: #f2f2f2;
+}
+
+button {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+.btn-action:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s ease-in-out;
+}
+
+footer {
+  background-color: #28a745;
+  color: #fff;
+  padding: 20px 0;
+  text-align: center;
+}
+
+footer p {
+  font-size: 14px;
+}
+
+.editBtn,
+.deleteBtn {
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.editBtn {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.deleteBtn {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.editBtn i,
+.deleteBtn i {
+  margin-right: 5px;
+}
+
+@media (max-width: 575.98px) {
+  .editBtn,
+  .deleteBtn {
+    width: 100%;
+  }
+}
+
+.editBtn:hover,
+.deleteBtn:hover {
+  cursor: pointer;
+}
+
+/* Styles for global statistics */
+.statistic-item {
+  margin-bottom: 20px;
+}
+
+.font-weight-bold {
+  font-weight: bold;
+}
+
+/* Loading overlay */
+.loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+#globalStats .card {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+}
+
+#globalStats .card-title {
+  color: #28a745;
+}
+
+#globalStats .font-weight-bold {
+  color: #28a745;
+}
+
+/* Ajout de styles pour les messages d'erreur */
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.model-header {
+  background-color: #28a745;
+  color: #fff;
+  border-bottom: 2px solid #218838;
+  border-radius: 10px 10px 0 0;
+}
+
+#gestion-utilisateurs {
+  margin-top: 20px;
+}
+
+.modal-content {
+  border-radius: 10px; /* Correction de la syntaxe */
+}
+
+.modal-title {
+  margin-bottom: 15px;
+}
+/* Styles pour le formulaire et l'interrupteur */
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.custom-control {
+  position: relative;
+  display: inline-block;
+  min-height: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.custom-control-input {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+}
+
+.custom-control-label {
+  position: relative;
+  margin-bottom: 0;
+  vertical-align: top;
+}
+
+.custom-switch {
+  padding-left: 2.25rem;
+}
+
+.custom-switch .custom-control-label::before {
+  left: -2.25rem;
+  width: 2rem;
+  pointer-events: all;
+  border-radius: 0.5rem;
+}
+
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+  background-color: #28a745; /* Couleur de fond lorsqu'il est activé */
+}
+
+.custom-switch .custom-control-input:checked ~ .custom-control-label::after {
+  left: calc(100% - 2.25rem);
+  width: 2.25rem;
+}
+
+.custom-switch .custom-control-input:disabled ~ .custom-control-label {
+  color: #868e96; /* Couleur du texte lorsqu'il est désactivé */
+}
+
+.custom-switch .custom-control-input:disabled ~ .custom-control-label::before {
+  background-color: #e9ecef; /* Couleur de fond lorsqu'il est désactivé */
+}
+/* Styles pour la section des statistiques globales */
+/* Styles for global statistics */
+/* Styles pour la section des statistiques globales */
+#statistiques-globales {
+  padding: 40px 0;
+}
+
+#globalStats .card {
+  border-radius: 10px;
+}
+
+#globalStats .card-title {
+  color: #28a745;
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+#globalStats .font-weight-bold {
+  color: #28a745;
+}
+
+@media (max-width: 991.98px) {
+  #globalStats .card {
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  #globalStats .card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #globalStats .card {
+    padding: 15px;
+  }
+  
+  #globalStats .card-title {
+    font-size: 18px;
+  }
+}
+
+
+
+/* Ajout de styles pour les paragraphes de description */
+#globalStats .card-text {
+  color: #333;
+  font-size: 16px;
+}
+
+/* Ajout de styles pour les nombres en gras */
+#globalStats .font-weight-bold {
+  font-size: 18px;
+}
+
+/* Ajout de styles pour les titres de carte */
+#globalStats .card-title {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+/* Ajout de styles pour les cartes */
+#globalStats .card {
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Ajout de styles pour les colonnes */
+#globalStats .col-md-6 {
+  margin-bottom: 20px;
+}
+
+/* Ajout de styles pour les bordures de carte */
+#globalStats .card {
+  border: none;
+  border-radius: 10px;
+}
+
+/* Ajout de styles pour le fond de carte */
+#globalStats .card-body {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* Ajout de styles pour les titres des cartes */
+#globalStats .card-title {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* Ajout de styles pour les textes des cartes */
+#globalStats .card-text {
+  color: #555;
+  font-size: 16px;
+}
+
+/* Ajout de styles pour les nombres en gras */
+#globalStats .font-weight-bold {
+  font-size: 20px;
+  color: #28a745;
+}
+
+
+
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container-fluid" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+      <h1>Tableau de Bord Admin</h1>
+    </div>
+  </header>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-top">
+        Dashboard
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="#"><i class="fas fa-home"></i> Accueil</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#gestion-utilisateurs"><i class="fas fa-users"></i> Gestion des Utilisateurs</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#statistiques-globales"><i class="fas fa-chart-bar"></i> Statistiques Globales</a>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link btn btn-outline-light" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+
+  <main>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+            <section id="gestion-utilisateurs">
+                <h2 class="text">Gestion des Utilisateurs</h2>
+                
+                <div class="table-responsive">
+                  <table id="userList" class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th>Nom Utilisateur</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Exemple d'affichage d'un utilisateur -->
+                      <tr class="user">
+                        <td class="username">Nom Utilisateur</td>
+                        <td class="email">utilisateur@example.com</td>
+                        <td class="role">Administrateur</td>
+                        <td class="userActions">
+                          <button class="editBtn btn btn-info btn-action" data-toggle="modal" data-target="#editUserModal">Modifier</button>
+                          <button class="deleteBtn btn btn-danger btn-action">Supprimer</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              
+                <button id="addUserBtn" class="btn btn-success" data-toggle="modal" data-target="#addUserModal">Ajouter un Utilisateur</button>
+              
+                <!-- Formulaire de modification d'utilisateur sous forme de modal -->
+  <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editUserModalLabel">Modifier un Utilisateur</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Formulaire de modification d'utilisateur -->
+        <form id="editUserForm">
+          <div class="form-group">
+            <label for="editUsername">Nom Utilisateur</label>
+            <input type="text" class="form-control" id="editUsername" required>
+          </div>
+          <div class="form-group">
+            <label for="editEmail">Email</label>
+            <input type="email" class="form-control" id="editEmail" required>
+          </div>
+          <!-- Ajout du champ mot de passe -->
+          <div class="form-group">
+            <label for="editPassword">Mot de passe</label>
+            <input type="password" class="form-control" id="editPassword" required>
+          </div>
+          <!-- Fin de l'ajout du champ mot de passe -->
+          <div class="form-group">
+            <label for="editRole">Rôle</label>
+            <select class="form-control" id="editRole" required>
+              <option value="Administrateur">Administrateur</option>
+              <option value="Utilisateur">Utilisateur</option>
+            </select>
+          </div>
+          <div id="editUsernameError" class="error-message"></div>
+          <div id="editEmailError" class="error-message"></div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">Modifier</button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+                 
+                <!-- Formulaire d'ajout d'utilisateur sous forme de modal -->
+                <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                     <div class="modal-content">
+                       <div class="modal-header">
+                         <h5 class="modal-title" id="addUserModalLabel">Ajouter un Utilisateur</h5>
+                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                           <span aria-hidden="true">&times;</span>
+                         </button>
+                       </div>
+                       <div class="modal-body">
+                         <form class="Ajouter" id="addUserForm" action="/path/to/your/server/script" method="post">
+                           <div class="form-group">
+                             <label for="nom">Nom :</label>
+                             <input type="text" class="form-control" id="nom" name="nom" required>
+                           </div>
+                           <div class="form-group">
+                             <label for="prenom">Prénom :</label>
+                             <input type="text" class="form-control" id="prenom" name="prenom" required>
+                           </div>
+                           <div class="form-group">
+                             <label for="email">E-mail :</label>
+                             <input type="email" class="form-control" id="email" name="email" required>
+                           </div>
+                           <div class="form-group">
+                             <label for="password">Mot de passe :</label>
+                             <input type="password" class="form-control" id="password" name="password" required>
+                           </div>
+                           <div class="form-group">
+                             <label for="role">Rôle :</label>
+                             <select class="form-control" id="role" name="role" required>
+                               <option value="user">Utilisateur</option>
+                               <option value="admin">Administrateur</option>
+                             </select>
+                           </div>
+                           <div class="modal-footer">
+                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                             <button type="submit" class="btn btn-primary" id="addUserBtn">Ajouter</button>
+                           </div>
+                         </form>
+                       </div>
+                     </div>
+                  </div>
+                 </div>
+                 
+                
+              </section>
+              
+              
+
+              <section id="statistiques-globales" class="loading">
+                <div class="container">
+                  <h2 class="text mb-4">Statistiques Globales</h2>
+                  <div id="globalStats" class="row">
+                    <div class="col-lg-6 mb-4">
+                      <div class="card h-100">
+                        <div class="card-body text-center">
+                          <h5 class="card-title">Nombre total d'utilisateurs</h5>
+                          <p class="card-text">Actuellement, il y a <span id="totalUsers" class="font-weight-bold">N/A</span> utilisateurs enregistrés.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                      <div class="card h-100">
+                        <div class="card-body text-center">
+                          <h5 class="card-title">Utilisateurs actifs</h5>
+                          <p class="card-text">Sur les utilisateurs enregistrés, <span id="activeUsers" class="font-weight-bold">N/A</span> sont actuellement actifs.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              
+            
+          
+          
+          
+          
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container-fluid">
+      <p>Dashboard Admin - Tous droits réservés</p>
+    </div>
+  </footer>
+
+  <!-- jQuery, Popper.js, Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.9/firebase-app.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.6.9/firebase-auth.js";
+    import { getDocs, collection } from "https://www.gstatic.com/firebasejs/9.6.9/firebase-firestore.js";
+    import { db } from "./firebase-config.js"; // Assuming you have a separate module for Firebase configuration
+   
+    // Initialize Firebase with your project's configuration details
+    const firebaseConfig = {
+        apiKey: "AIzaSyAFBon2ZjU1patYlYoitycfYYED71XduPo",
+        authDomain: "fir-691e8.firebaseapp.com",
+        projectId: "fir-691e8",
+        storageBucket: "fir-691e8.appspot.com",
+        messagingSenderId: "944321471274",
+        appId: "1:944321471274:web:b9126bd1020bd203b57453"
+    };
+   
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+   
+    document.addEventListener('DOMContentLoaded', function() {
+       // Gestion du changement de rôle avec l'élément switch
+       var roleSwitch = document.getElementById('roleSwitch');
+       var roleLabel = document.getElementById('roleLabel');
+   
+       if (roleSwitch && roleLabel) {
+         roleSwitch.addEventListener('change', function () {
+           roleLabel.textContent = roleSwitch.checked ? 'Admin' : 'User';
+         });
+       }
+   
+       // Logique de déconnexion
+       var logoutBtn = document.getElementById('logoutBtn');
+   
+       if (logoutBtn) {
+         logoutBtn.addEventListener('click', function () {
+           signOut(auth).then(() => {
+             // Sign-out successful.
+             // Redirection vers la page de connexion
+             window.location.href = 'connexion.html';
+           }).catch((error) => {
+             // An error happened.
+             console.error('Sign Out Error', error);
+           });
+         });
+       }
+   
+       // Identifiant DOM pour afficher le nombre d'utilisateurs
+       const totalUsersElement = document.getElementById('totalUsers');
+   
+       if (totalUsersElement) {
+         // Fonction pour récupérer le nombre total d'utilisateurs depuis Firestore
+         const getTotalUsersCount = async () => {
+           try {
+             const querySnapshot = await getDocs(collection(db, 'utilisateurs'));
+             return querySnapshot.size; // Retourne le nombre total de documents dans la collection
+           } catch (error) {
+             console.error("Erreur lors de la récupération du nombre d'utilisateurs :", error);
+             return 0; // En cas d'erreur, retourne 0
+           }
+         };
+   
+         // Fonction pour mettre à jour dynamiquement l'affichage du nombre d'utilisateurs
+         const updateTotalUsersCount = async () => {
+           const totalUsersCount = await getTotalUsersCount();
+           totalUsersElement.textContent = totalUsersCount;
+         };
+   
+         // Appel initial pour mettre à jour l'affichage du nombre d'utilisateurs
+         updateTotalUsersCount();
+       }
+   
+       // Supprime la classe loading pour révéler les statistiques réelles
+       var statsSection = document.getElementById('statistiques-globales');
+       if (statsSection) {
+         statsSection.classList.remove('loading');
+       }
+   
+       // Masque l'overlay de chargement après une pause de 2 secondes
+       setTimeout(function () {
+         var loadingOverlay = document.getElementById('loadingOverlay');
+         if (loadingOverlay) {
+           loadingOverlay.style.opacity = 0;
+           setTimeout(function () {
+             loadingOverlay.style.display = 'none';
+           }, 500);
+         }
+       }, 2000);
+    });
+   </script>
+   
+ <script src="./bundle.js"></script>
+</body>
+</html>

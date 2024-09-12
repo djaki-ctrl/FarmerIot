@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphique des Capteurs</title>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .chart-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            transition: 0.3s;
+            border-radius: 5px;
+        }
+        .chart-container:hover {
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <canvas id="temperatureChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="lightIntensityChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="soilMoistureChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="gasConcentrationChart"></canvas>
+    </div> <!-- Correction ici -->
+    
+    <script>
+        // Configuration de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFBon2ZjU1patYlYoitycfYYED71XduPo",
+            authDomain: "fir-691e8.firebaseapp.com",
+            databaseURL: "https://fir-691e8-default-rtdb.firebaseio.com",
+            projectId: "fir-691e8",
+            storageBucket: "fir-691e8.appspot.com",
+            messagingSenderId: "944321471274",
+            appId: "1:944321471274:web:b9126bd1020bd203b57453"
+        };
+        // Initialisation de Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        var db = firebase.database();
+        var ref = db.ref("sensorData");
+
+        // Configuration des graphiques
+        var temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
+        var temperatureChart = new Chart(temperatureCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Température',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Température'
+                }
+            }
+        });
+
+        var lightIntensityCtx = document.getElementById('lightIntensityChart').getContext('2d');
+        var lightIntensityChart = new Chart(lightIntensityCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Intensité Lumineuse',
+                    data: [],
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Intensité Lumineuse'
+                }
+            }
+        });
+
+        var soilMoistureCtx = document.getElementById('soilMoistureChart').getContext('2d');
+        var soilMoistureChart = new Chart(soilMoistureCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Humidité du Sol',
+                    data: [],
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Humidité du Sol'
+                }
+            }
+        });
+
+        var gasConcentrationCtx = document.getElementById('gasConcentrationChart').getContext('2d');
+        var gasConcentrationChart = new Chart(gasConcentrationCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Concentration de Gaz',
+                    data: [],
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Concentration de Gaz'
+                }
+            }
+        });
+
+        // Récupération des données de Firebase et mise à jour des graphiques
+        ref.on("value", function(snapshot) {
+            snapshot.forEach(function(childSnapshot) {
+                var childData = childSnapshot.val();
+                var timestamp = childSnapshot.key;
+                temperatureChart.data.labels.push(timestamp);
+                temperatureChart.data.datasets[0].data.push(childData.temperature);
+                temperatureChart.update();
+
+                lightIntensityChart.data.labels.push(timestamp);
+                lightIntensityChart.data.datasets[0].data.push(childData.lightIntensity);
+                lightIntensityChart.update();
+
+                soilMoistureChart.data.labels.push(timestamp);
+                soilMoistureChart.data.datasets[0].data.push(childData.soilMoisture);
+                soilMoistureChart.update();
+
+                gasConcentrationChart.data.labels.push(timestamp);
+                gasConcentrationChart.data.datasets[0].data.push(childData.gasConcentration);
+                gasConcentrationChart.update();
+            });
+        });
+    </script>
+</body>
+</html>

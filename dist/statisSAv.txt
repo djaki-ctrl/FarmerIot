@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistiques du Champ</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa; /* Couleur de fond plus douce */
+      color: #333;
+      min-height: calc(100vh - 100px);
+    }
+
+    .navbar {
+      background-color: #4CAF50;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      padding: 14px 8px;
+      display: inline-block;
+    }
+
+    .navbar a:hover {
+      background-color: #45a049;
+    }
+
+    .container {
+      position: relative;
+    }
+
+    @keyframes breathe {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .sensor-info {
+      background-color: #fff;
+      padding: 20px; /* Ajustez la taille du rembourrage en fonction de la taille de l'écran */
+      border-radius: 10px; /* Ajustez le rayon de bordure en fonction de la taille de l'écran */
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Ajustez l'ombre en fonction de la taille de l'écran */
+      transition: transform 0.8s;
+      cursor: pointer;
+      margin-bottom: 30px; /* Ajustez la marge en fonction de la taille de l'écran */
+      animation: breathe 4s infinite alternate;
+    }
+
+    .sensor-info:hover {
+      transform: scale(1.13); /* Ajuster la valeur de l'échelle selon vos préférences */
+    }
+
+    .sensor-info h3 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      color: #4CAF50;
+    }
+
+    .sensor-info p {
+      color: #4CAF50;
+    }
+
+    .sensor-info p.second-text {
+      font-size: 0.9em;
+    }
+
+    .chart-container {
+      position: relative;
+      margin: auto;
+      height: 200px;
+      width: 100%;
+    }
+
+    footer {
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      width: 100%;
+    }
+
+    footer a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .sensor-details {
+      display: none;
+    }
+
+.sensor-info.active {
+  position: fixed;
+  top: 10%;
+  left: 10%;
+  margin-top: 100px;
+  margin-left: 120px;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  width: 60vw;
+  max-height: 120vh; /* Limitez la hauteur maximale du bloc */
+  overflow-y: auto; /* Activez le défilement vertical si nécessaire */
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+/* Style pour le bouton de déconnexion */
+.logout-btn {
+  color: white; /* Couleur du texte */
+  text-decoration: none; /* Supprime le soulignement du texte */
+  padding: 10px 20px; /* Espacement à l'intérieur du bouton */
+  background-color: #379422; /* Couleur de fond par défaut */
+  border: none; /* Supprime la bordure */
+  border-radius: 50px; /* Arrondi les coins pour créer un bouton rond */
+  transition: background-color 0.3s; /* Transition fluide lors du survol */
+  position: relative; /* Position relative pour le positionnement absolu du texte */
+}
+
+.logout-btn::after {
+  content: "Déconnexion"; /* Ajoutez le texte "Déconnexion" */
+  position: absolute; /* Positionnez le texte par rapport au bouton */
+  top: 50%; /* Centre le texte verticalement */
+  left: calc(100% + 10px); /* Déplacez le texte à droite du bouton avec un espacement de 10px */
+  transform: translateY(-50%); /* Centre le texte verticalement */
+  white-space: nowrap; /* Empêchez le texte de se retourner s'il est trop long */
+  background-color: #379422; /* Couleur de fond par défaut */
+  color: white; /* Couleur du texte */
+  border-radius: 5px; /* Arrondi les coins */
+  transition: opacity 0.3s, transform 0.3s; /* Ajoutez une transition fluide */
+  opacity: 0; /* Par défaut, le texte est transparent */
+  pointer-events: none; /* Le texte ne doit pas être cliquable */
+}
+
+.logout-btn:hover::after {
+  opacity: 1; /* Affichez le texte au survol */
+  transform: translateY(-50%) translateX(10px); /* Déplacez le texte à sa position finale avec un léger décalage */
+}
+
+
+
+/* Style pour l'icône de déconnexion */
+.logout-btn .bi {
+  margin-right: 5px; /* Espacement entre l'icône et le texte */
+  font-size: 1.2em; /* Ajustement de la taille de l'icône */
+  vertical-align: auto; /* Centre l'icône verticalement */
+  margin-left: 4px;
+}
+
+
+
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="dashboard.html"><i class="bi bi-house-door"></i> Accueil</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="statistiques.html"><i class="bi bi-bar-chart-line"></i> Statistiques</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              <i class="bi bi-speedometer2"></i> Capteurs
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#temperature"><i class="bi bi-thermometer"></i> Température</a></li>
+              <li><a class="dropdown-item" href="#lightIntensity"><i class="bi bi-brightness-high"></i> Intensité Lumineuse</a></li>
+              <li><a class="dropdown-item" href="#soilMoisture"><i class="bi bi-cloud-rain"></i> Humidité du Sol</a></li>
+              <li><a class="dropdown-item" href="#gasConcentration"><i class="bi bi-cloud"></i> Concentration de Gaz</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="info.html"><i class="bi bi-info-circle"></i> Infos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-btn" href="#" id="logoutBtn">
+              <i class="bi bi-power"></i> <!-- Icône de déconnexion -->
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2 class="mb-4">Statistiques des Capteurs</h2>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="sensor-info temperature" onclick="toggleSensorInfo(this)">
+          <h3><i class="bi bi-thermometer"></i></h3>
+          <p>Température</p>
+          <p class="second-text">Données en temps réel</p>
+          <div class="chart-container">
+            <canvas id="temperatureChart"></canvas>
+          </div>
+          <div class="sensor-details">
+            <!-- Ajoutez les détails de la température ici -->
+          </div>
+       </div>
+      </div>
+      <div class="col-md-6">
+        <div class="sensor-info lightIntensity" onclick="toggleSensorInfo(this)">
+          <h3><i class="bi bi-brightness-high"></i></h3>
+          <p>Intensité Lumineuse</p>
+          <p class="second-text">Données en temps réel</p>
+          <div class="chart-container">
+            <canvas id="lightIntensityChart"></canvas>
+          </div>
+          <div class="sensor-details">
+            <!-- Ajoutez les détails de l'intensité lumineuse ici -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="sensor-info soilMoisture" onclick="toggleSensorInfo(this)">
+          <h3><i class="bi bi-cloud-rain"></i></h3>
+          <p>Humidité du Sol</p>
+          <p class="second-text">Données en temps réel</p>
+          <div class="chart-container">
+            <canvas id="soilMoistureChart"></canvas>
+          </div>
+          <div class="sensor-details">
+            <!-- Ajoutez les détails de l'humidité du sol ici -->
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="sensor-info gasConcentration" onclick="toggleSensorInfo(this)">
+          <h3><i class="bi bi-cloud"></i></h3>
+          <p>Concentration de Gaz</p>
+          <p class="second-text">Données en temps réel</p>
+          <div class="chart-container">
+            <canvas id="gasConcentrationChart"></canvas>
+          </div>
+          <div class="sensor-details">
+            <!-- Ajoutez les détails de la concentration de gaz ici -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="mt-5">
+    <p>Site développé par <a href="#"><img src="url_votre_logo.png" alt="Logo" class="footer-logo">Votre Nom</a> | Suivez-nous sur 
+      <a href="#"><i class="fab fa-facebook"></i></a> 
+      <a href="#"><i class="fab fa-twitter"></i></a> 
+      <a href="#"><i class="fab fa-instagram"></i></a>
+    </p>
+  </footer>
+
+  <script>
+    function toggleSensorInfo(element) {
+      var $this = $(element);
+      if ($this.hasClass("active")) {
+        $this.removeClass("active");
+      } else {
+        $(".sensor-info").removeClass("active");
+        $this.addClass("active");
+      }
+    }
+  </script>
+  <script src="scriptChart.js"></script>
+</body>
+
+</html>

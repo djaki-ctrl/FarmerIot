@@ -1,0 +1,242 @@
+/* Reset CSS */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f2f2f2; /* Couleur de fond légèrement grise */
+
+}    
+.navbar {
+    background-color: #4CAF50;
+    padding: 13px;
+    text-align: center;
+  }
+
+  .navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 14px 8px;
+    display: inline-block;
+  }
+
+  .navbar a:hover {
+    background-color: #45a049;
+  }
+
+/* Conteneur principal */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Styles pour les titres */
+h1, h2, h3 {
+    color: #4CAF50; /* Vert agricole */
+}
+
+/* Styles pour les paragraphes */
+p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #555; /* Couleur de texte légèrement plus foncée */
+}
+
+/* Styles pour les info-boxes */
+.info-box {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.info-box h2 {
+    color: #4CAF50;
+    margin-bottom: 15px;
+}
+
+.info-box ul {
+    margin-left: 20px;
+}
+
+.info-box ul li {
+    margin-bottom: 10px;
+}
+
+/* Styles pour les boutons */
+.button {
+    display: inline-block;
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: #63a1b9;
+}
+
+/* Styles pour le footer */
+.footer {
+    background-color: #4CAF50;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer-content p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Styles pour les icônes de médias sociaux */
+.social-icons {
+    margin-left: 20px;
+}
+
+.social-icons a {
+    display: inline-block;
+    margin-right: 10px;
+    color: #fff;
+    font-size: 24px;
+    transition: color 0.3s;
+}
+
+.social-icons a:hover {
+    color: #070707;
+}
+
+/* Styles pour les images des capteurs */
+.sensor-image {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}
+/* Ajout de styles pour la section de contact */
+.contact-section {
+    padding: 50px 0; /* Ajouter de l'espace autour du formulaire de contact */
+    background-color: rgba(255, 255, 255, 0.9); /* Fond semi-transparent pour la section de contact */
+    border-radius: 20px; /* Coins arrondis pour la section de contact */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Ombre pour la section de contact */
+}
+
+.contact-section h2 {
+    color: #4CAF50;
+    margin-bottom: 30px;
+    font-family: 'Georgia', serif; /* Police de caractères rustique pour les titres */
+}
+
+.contact-section p {
+    margin-bottom: 30px;
+}
+
+.contact-section form {
+    margin-top: 20px;
+}
+
+.contact-section .form-group {
+    margin-bottom: 20px;
+}
+
+.contact-section input[type="text"],
+.contact-section input[type="email"],
+.contact-section textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    transition: border-color 0.3s;
+    font-size: 16px;
+}
+
+.contact-section input[type="text"]:focus,
+.contact-section input[type="email"]:focus,
+.contact-section textarea:focus {
+    border-color: transparent;
+}
+
+.contact-section button {
+    width: 100%;
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.contact-section button:hover {
+    background-color: #45a049;
+}
+
+/* Styles pour les messages d'erreur dans le formulaire de contact */
+.contact-section .error-message {
+    color: #FF0000;
+    margin-top: 5px;
+}
+
+/* Styles pour les liens dans la section de contact */
+.contact-section a {
+    color: #4CAF50;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.contact-section a:hover {
+    color: #45a049;
+}
+/* Style pour le bouton de déconnexion */
+.logout-btn {
+    color: white; /* Couleur du texte */
+    text-decoration: none; /* Supprime le soulignement du texte */
+    padding: 10px 20px; /* Espacement à l'intérieur du bouton */
+    background-color: #379422; /* Couleur de fond par défaut */
+    border: none; /* Supprime la bordure */
+    border-radius: 50px; /* Arrondi les coins pour créer un bouton rond */
+    transition: background-color 0.3s; /* Transition fluide lors du survol */
+    position: relative; /* Position relative pour le positionnement absolu du texte */
+  }
+  
+  .logout-btn::after {
+    content: "Déconnexion"; /* Ajoutez le texte "Déconnexion" */
+    position: absolute; /* Positionnez le texte par rapport au bouton */
+    top: 50%; /* Centre le texte verticalement */
+    left: calc(100% + 10px); /* Déplacez le texte à droite du bouton avec un espacement de 10px */
+    transform: translateY(-50%); /* Centre le texte verticalement */
+    white-space: nowrap; /* Empêchez le texte de se retourner s'il est trop long */
+    background-color: #379422; /* Couleur de fond par défaut */
+    color: white; /* Couleur du texte */
+    border-radius: 5px; /* Arrondi les coins */
+    transition: opacity 0.3s, transform 0.3s; /* Ajoutez une transition fluide */
+    opacity: 0; /* Par défaut, le texte est transparent */
+    pointer-events: none; /* Le texte ne doit pas être cliquable */
+  }
+  
+  .logout-btn:hover::after {
+    opacity: 1; /* Affichez le texte au survol */
+    transform: translateY(-50%) translateX(10px); /* Déplacez le texte à sa position finale avec un léger décalage */
+  }
+  
+  
+  
+  /* Style pour l'icône de déconnexion */
+  .logout-btn .bi {
+    margin-right: 5px; /* Espacement entre l'icône et le texte */
+    font-size: 1.2em; /* Ajustement de la taille de l'icône */
+    vertical-align: auto; /* Centre l'icône verticalement */
+    margin-left: 4px;
+  }
+  
